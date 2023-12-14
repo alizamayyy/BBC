@@ -75,14 +75,14 @@ function Login() {
 
   return (
     <div className="flex flex-row w-full h-screen justify-center items-center">
-      <div className="w-2/4 bg-black">
+      <div className="w-2/4 bg-[#141f45] h-full">
         <h1>hello world</h1>
       </div>
-      <div className="bg-[#161616] flex flex-col justify-center items-center w-2/4 h-[100%] align-right">
+      <div className="bg-[#000517] flex flex-col justify-center items-center w-2/4 h-[100%] align-right">
         <Card
           className="w-2/5 h-96 flex flex-col justify-center items-center p-8 shadow-2xl"
           sx={{
-            backgroundColor: "#161616",
+            backgroundColor: "#000517",
             borderRadius: "20px",
           }}
         >
@@ -102,14 +102,14 @@ function Login() {
                 <form onSubmit={handleLogin}>
                   <div className="flex flex-col w-64">
                     <input
-                      className="shadow appearance-none rounded-xl bg-[#000000] py-2.5 px-4 text-gray-500 text-md leading-tight focus:shadow-outline focus:text-white mb-2"
+                      className="shadow appearance-none rounded-xl bg-[#1b1a38] py-2.5 px-4 text-gray-500 text-md leading-tight focus:shadow-outline focus:text-white mb-2"
                       type="text"
                       placeholder="Username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                     <input
-                      className="shadow appearance-none rounded-xl bg-[#000000] py-2.5 px-4 text-gray-500 text-md mb-5 leading-tight focus:shadow-outline"
+                      className="shadow appearance-none rounded-xl bg-[#1b1a38] py-2.5 px-4 text-gray-500 text-md mb-5 leading-tight focus:shadow-outline"
                       type="password"
                       placeholder="Password"
                       value={password}
@@ -118,7 +118,7 @@ function Login() {
                   </div>
                   <div className="flex justify-center">
                     <button
-                      className="bg-blue-500 hover:bg-blue-700 w-2/4 text-white font-bold px-4 rounded-xl focus:outline-none focus:shadow-outline h-9 mb-4"
+                      className="bg-[#6788ff] hover:bg-blue-700 w-2/4 text-white font-bold px-4 rounded-xl focus:outline-none focus:shadow-outline h-9 mb-4"
                       type="submit"
                     >
                       Login
@@ -149,14 +149,14 @@ function Login() {
                 <form onSubmit={handleRegister}>
                   <div className="flex flex-col w-64">
                     <input
-                      className="shadow appearance-none rounded-xl bg-[#000000] py-2.5 px-4 text-gray-500 text-md leading-tight focus:shadow-outline focus:text-white mb-2"
+                      className="shadow appearance-none rounded-xl bg-[#1b1a38] py-2.5 px-4 text-gray-500 text-md leading-tight focus:shadow-outline focus:text-white mb-2"
                       type="text"
                       placeholder="Username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                     <input
-                      className="shadow appearance-none rounded-xl bg-[#000000] py-2.5 px-4 text-gray-500 text-md mb-5 leading-tight focus:shadow-outline"
+                      className="shadow appearance-none rounded-xl bg-[#1b1a38] py-2.5 px-4 text-gray-500 text-md mb-5 leading-tight focus:shadow-outline"
                       type="password"
                       placeholder="Password"
                       value={password}
@@ -165,7 +165,7 @@ function Login() {
                   </div>
                   <div className="flex justify-center">
                     <button
-                      className="bg-blue-500 hover:bg-blue-700 w-2/4 text-white font-bold px-4 rounded-xl focus:outline-none focus:shadow-outline h-9 mb-4"
+                      className="bg-[#6788ff] hover:bg-blue-700 w-2/4 text-white font-bold px-4 rounded-xl focus:outline-none focus:shadow-outline h-9 mb-4"
                       type="submit"
                     >
                       Register
