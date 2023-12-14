@@ -1,0 +1,624 @@
+.\globals.css:
+```
+@tailwind base;
+@tailwind components;
+@tailwind utilities;```
+--------------------------
+
+.\tailwind.config.js:
+```
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    content: ["./src/**/*.{html,js}"],
+    theme: {
+      extend: {},
+    },
+    plugins: [],
+  }```
+--------------------------
+
+.\back\apiSummary.txt:
+```
+
+- **Create a user**
+  - localhost:5000/users
+  - POST
+  - Input: {username: string, password: string}
+  - Output: {message: string}
+- **Get a user by id**
+  - localhost:5000/users/<int:user_id>
+  - GET
+  - Input: None
+  - Output: {username: string, password: string} or {message: string}
+- **Update a user by id**
+  - localhost:5000/users/<int:user_id>
+  - PUT
+  - Input: {username: string, password: string}
+  - Output: {message: string}
+- **Delete a user by id**
+  - localhost:5000/users/<int:user_id>
+  - DELETE
+  - Input: None
+  - Output: {message: string}
+- **Login a user**
+  - localhost:5000/login
+  - POST
+  - Input: {username: string, password: string}
+  - Output: {username: string, password: string, id: int} or {message: string}
+- **Get all users**
+  - localhost:5000/users
+  - GET
+  - Input: None
+  - Output: [{id: int, username: string, password: string}, ...]
+- **Create a post**
+  - localhost:5000/posts
+  - POST
+  - Input: {title: string, content: string, user_id: int}
+  - Output: {message: string}
+- **Get a post by id**
+  - localhost:5000/posts/<int:post_id>
+  - GET
+  - Input: None
+  - Output: {title: string, content: string, user_id: int} or {message: string}
+- **Update a post by id**
+  - localhost:5000/posts/<int:post_id>
+  - PUT
+  - Input: {title: string, content: string}
+  - Output: {message: string}
+- **Delete a post by id**
+  - localhost:5000/posts/<int:post_id>
+  - DELETE
+  - Input: None
+  - Output: {message: string}
+- **Get all posts**
+  - localhost:5000/posts
+  - GET
+  - Input: None
+  - Output: [{id: int, title: string, content: string, user_id: int}, ...]
+- **Create a comment**
+  - localhost:5000/comments
+  - POST
+  - Input: {post_id: int, user_id: int, content: string}
+  - Output: {message: string}
+- **Get a comment by id**
+  - localhost:5000/comments/<int:comment_id>
+  - GET
+  - Input: None
+  - Output: {post_id: int, user_id: int, content: string} or {message: string}
+- **Update a comment by id**
+  - localhost:5000/comments/<int:comment_id>
+  - PUT
+  - Input: {content: string}
+  - Output: {message: string}
+- **Delete a comment by id**
+  - localhost:5000/comments/<int:comment_id>
+  - DELETE
+  - Input: None
+  - Output: {message: string}
+- **Get all comments**
+  - localhost:5000/comments
+  - GET
+  - Input: None
+  - Output: [{id: int, post_id: int, user_id: int, content: string}, ...]
+```
+--------------------------
+
+.\back\app.py:
+```
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import pymysql
+
+app = Flask(__name__)
+CORS(app)
+
+# Database Configuration
+db = pymysql.connect(host='localhost', user='root', password='root', db='text_blog')
+cursor = db.cursor()
+
+class User:
+    def __init__(self, username, password, id=None):
+        self.id = id
+        self.username = username
+        self.password = password
+
+    def save(self):
+        cursor.callproc("CreateUser", (self.username, self.password))
+        db.commit()
+    
+    @classmethod
+    def get_by_id(cls, user_id):
+        cursor.callproc("GetUserById", (user_id,))
+        user_data = cursor.fetchone()
+        if user_data:
+            return cls(user_data[1], user_data[2], user_data[0])
+        return None
+
+    def update(self, new_username, new_password):
+        cursor.callproc("UpdateUser", (self.id, new_username, new_password))
+        db.commit()
+
+    def delete(self):
+        cursor.callproc("DeleteUser", (self.id,))
+        db.commit()
+
+    @classmethod
+    def get_all(cls):
+        cursor.callproc("GetAllUsers")
+        users_data = cursor.fetchall()
+        users = [{'id': user[0], 'username': user[1], 'password': user[2]} for user in users_data]
+        return users
+    
+    @classmethod
+    def login(cls, username, password):
+        cursor.callproc("GetUserByUsername", (username,))
+        user_data = cursor.fetchone()
+        if user_data and user_data[2] == password:
+            return cls(user_data[1], user_data[2], user_data[0])
+        return None
+    
+class Post:
+    def __init__(self, title, content, user_id, id=None):
+        self.id = id
+        self.title = title
+        self.content = content
+        self.user_id = user_id
+
+    def save(self):
+        cursor.callproc("CreatePost", (self.title, self.content, self.user_id))
+        db.commit()
+
+    @classmethod
+    def get_by_id(cls, post_id):
+        cursor.callproc("GetPostById", (post_id,))
+        post_data = cursor.fetchone()
+        if post_data:
+            return cls(post_data[1], post_data[2], post_data[3], post_data[0])
+        return None
+
+    def update(self, new_title, new_content):
+        cursor.callproc("UpdatePost", (self.id, new_title, new_content))
+        db.commit()
+
+    def delete(self):
+        cursor.callproc("DeletePost", (self.id,))
+        db.commit()
+
+    @classmethod
+    def get_all(cls):
+        cursor.callproc("GetAllPosts")
+        posts_data = cursor.fetchall()
+        posts = [
+            {
+                'id': post[0],
+                'title': post[1],
+                'content': post[2],
+                'user_id': post[3],
+                'created_at': post[4],  # Assuming the 5th column is created_at
+                'updated_at': post[5]   # Assuming the 6th column is updated_at
+            }
+            for post in posts_data
+        ]
+        return posts
+
+class Comment:
+    def __init__(self, post_id, user_id, content, id=None):
+        self.id = id
+        self.post_id = post_id
+        self.user_id = user_id
+        self.content = content
+
+    def save(self):
+        cursor.callproc("CreateComment", (self.post_id, self.user_id, self.content))
+        db.commit()
+
+    @classmethod
+    def get_by_id(cls, comment_id):
+        cursor.callproc("GetCommentById", (comment_id,))
+        comment_data = cursor.fetchone()
+        if comment_data:
+            return cls(comment_data[1], comment_data[2], comment_data[3], comment_data[0])
+        return None
+
+    def update(self, new_content):
+        cursor.callproc("UpdateComment", (self.id, new_content))
+        db.commit()
+
+    def delete(self):
+        cursor.callproc("DeleteComment", (self.id,))
+        db.commit()
+
+    @classmethod
+    def get_all(cls):
+        cursor.callproc("GetAllComments")
+        comments_data = cursor.fetchall()
+        comments = [{'id': comment[0], 'post_id': comment[1], 'user_id': comment[2], 'content': comment[3]} for comment in comments_data]
+        return comments
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+    user = User(username, password)
+    user.save()
+    return jsonify({'message': 'User created successfully'}), 201
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.get_by_id(user_id)
+    if user:
+        return jsonify({'username': user.username, 'password': user.password}), 200
+    return jsonify({'message': 'User not found'}), 404
+
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    data = request.get_json()
+    new_username = data['username']
+    new_password = data['password']
+    user = User.get_by_id(user_id)
+    if user:
+        user.update(new_username, new_password)
+        return jsonify({'message': 'User updated successfully'}), 200
+    return jsonify({'message': 'User not found'}), 404
+
+@app.route('/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    user = User.get_by_id(user_id)
+    if user:
+        user.delete()
+        return jsonify({'message': 'User deleted successfully'}), 200
+    return jsonify({'message': 'User not found'}), 404
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    # Check if the username and password match a user in the database
+    user = User.login(username, password)
+    if user:
+        # Return the user data as a JSON response
+        return jsonify({
+            'username': user.username,
+            'password': user.password,
+            'id': user.id
+        }), 200
+    else:
+        return jsonify({'message': 'Login failed. Please check your credentials'}), 401
+
+
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    users = User.get_all()
+    return jsonify(users), 200
+
+@app.route('/posts', methods=['POST'])
+def create_post():
+    data = request.get_json()
+    title = data['title']
+    content = data['content']
+    user_id = data['user_id']
+    post = Post(title, content, user_id)
+    post.save()
+    return jsonify({'message': 'Post created successfully'}), 201
+
+@app.route('/posts/<int:post_id>', methods=['GET'])
+def get_post(post_id):
+    post = Post.get_by_id(post_id)
+    if post:
+        return jsonify({'title': post.title, 'content': post.content, 'user_id': post.user_id}), 200
+    return jsonify({'message': 'Post not found'}), 404
+
+@app.route('/posts/<int:post_id>', methods=['PUT'])
+def update_post(post_id):
+    data = request.get_json()
+    new_title = data['title']
+    new_content = data['content']
+    post = Post.get_by_id(post_id)
+    if post:
+        post.update(new_title, new_content)
+        return jsonify({'message': 'Post updated successfully'}), 200
+    return jsonify({'message': 'Post not found'}), 404
+
+@app.route('/posts/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    post = Post.get_by_id(post_id)
+    if post:
+        post.delete()
+        return jsonify({'message': 'Post deleted successfully'}), 200
+    return jsonify({'message': 'Post not found'}), 404
+
+@app.route('/posts', methods=['GET'])
+def get_all_posts():
+    posts = Post.get_all()
+    return jsonify(posts), 200
+
+@app.route('/comments', methods=['POST'])
+def create_comment():
+    data = request.get_json()
+    post_id = data['post_id']
+    user_id = data['user_id']
+    content = data['content']
+    comment = Comment(post_id, user_id, content)
+    comment.save()
+    return jsonify({'message': 'Comment created successfully'}), 201
+
+@app.route('/comments/<int:comment_id>', methods=['GET'])
+def get_comment(comment_id):
+    comment = Comment.get_by_id(comment_id)
+    if comment:
+        return jsonify({'post_id': comment.post_id, 'user_id': comment.user_id, 'content': comment.content}), 200
+    return jsonify({'message': 'Comment not found'}), 404
+
+@app.route('/comments/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    data = request.get_json()
+    new_content = data['content']
+    comment = Comment.get_by_id(comment_id)
+    if comment:
+        comment.update(new_content)
+        return jsonify({'message': 'Comment updated successfully'}), 200
+    return jsonify({'message': 'Comment not found'}), 404
+
+@app.route('/comments/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    comment = Comment.get_by_id(comment_id)
+    if comment:
+        comment.delete()
+        return jsonify({'message': 'Comment deleted successfully'}), 200
+    return jsonify({'message': 'Comment not found'}), 404
+
+@app.route('/comments', methods=['GET'])
+def get_all_comments():
+    comments = Comment.get_all()
+    return jsonify(comments), 200
+
+@app.route('/users/<int:user_id>/posts_and_comments', methods=['GET'])
+def get_user_posts_and_comments(user_id):
+    cursor.execute("SELECT * FROM user_posts_and_comments WHERE user_id = %s", (user_id,))
+    data = cursor.fetchall()
+    result = [{'post_id': row[0], 'post_title': row[1], 'post_content': row[2], 'comment_id': row[3], 'comment_content': row[4]} for row in data]
+    return jsonify(result), 200
+
+@app.route('/posts/recent', methods=['GET'])
+def get_recent_posts():
+    cursor.execute("SELECT * FROM recent_posts")
+    data = cursor.fetchall()
+    result = [{'id': row[0], 'title': row[1], 'content': row[2], 'user_id': row[3], 'created_at': row[4], 'updated_at': row[5]} for row in data]
+    return jsonify(result), 200
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+```
+--------------------------
+
+.\back\schema.sql:
+```
+CREATE DATABASE IF NOT EXISTS text_blog;
+
+USE text_blog;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  user_id INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  post_id INT NOT NULL,
+  user_id INT NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS update_post_updated_at$$
+CREATE TRIGGER update_post_updated_at
+BEFORE UPDATE ON posts
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP;
+END$$
+
+DROP TRIGGER IF EXISTS update_comment_updated_at$$
+CREATE TRIGGER update_comment_updated_at
+BEFORE UPDATE ON comments
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP;
+END$$
+
+DELIMITER ;
+
+
+CREATE OR REPLACE VIEW most_commented_posts AS
+SELECT posts.*, COUNT(*) AS comment_count
+FROM posts
+INNER JOIN comments ON posts.id = comments.post_id
+GROUP BY posts.id
+ORDER BY comment_count DESC;
+
+CREATE OR REPLACE VIEW recent_posts AS
+SELECT * FROM posts
+ORDER BY created_at DESC
+LIMIT 10;
+
+DELIMITER $$
+
+-- Users
+-- Create User
+DROP PROCEDURE IF EXISTS CreateUser$$
+CREATE PROCEDURE CreateUser(IN username VARCHAR(255), IN password VARCHAR(255))
+BEGIN
+    INSERT INTO users (username, password) VALUES (username, password);
+END$$
+
+-- Get User by ID
+DROP PROCEDURE IF EXISTS GetUserById$$
+CREATE PROCEDURE GetUserById(IN user_id INT)
+BEGIN
+    SELECT * FROM users WHERE id = user_id;
+END$$
+
+-- Get User by Username
+DROP PROCEDURE IF EXISTS GetUserByUsername$$
+CREATE PROCEDURE GetUserByUsername(IN in_username VARCHAR(255))
+BEGIN
+    SELECT * FROM users WHERE username = in_username;
+END$$
+
+-- Update User
+DROP PROCEDURE IF EXISTS UpdateUser$$
+CREATE PROCEDURE UpdateUser(IN user_id INT, IN new_username VARCHAR(255), IN new_password VARCHAR(255))
+BEGIN
+    UPDATE users SET username = new_username, password = new_password WHERE id = user_id;
+END$$
+
+-- Delete User
+DROP PROCEDURE IF EXISTS DeleteUser$$
+CREATE PROCEDURE DeleteUser(IN user_id INT)
+BEGIN
+    DELETE FROM users WHERE id = user_id;
+END$$
+
+-- Get All Users
+DROP PROCEDURE IF EXISTS GetAllUsers$$
+CREATE PROCEDURE GetAllUsers()
+BEGIN
+    SELECT * FROM users;
+END$$
+
+-- Posts
+-- Create Post
+DROP PROCEDURE IF EXISTS CreatePost$$
+CREATE PROCEDURE CreatePost(IN title VARCHAR(255), IN content TEXT, IN user_id INT)
+BEGIN
+    INSERT INTO posts (title, content, user_id) VALUES (title, content, user_id);
+END$$
+
+-- Get Post by ID
+DROP PROCEDURE IF EXISTS GetPostById$$
+CREATE PROCEDURE GetPostById(IN post_id INT)
+BEGIN
+    SELECT * FROM posts WHERE id = post_id;
+END$$
+
+-- Update Post
+DROP PROCEDURE IF EXISTS UpdatePost$$
+CREATE PROCEDURE UpdatePost(IN post_id INT, IN new_title VARCHAR(255), IN new_content TEXT)
+BEGIN
+    UPDATE posts SET title = new_title, content = new_content WHERE id = post_id;
+END$$
+
+-- Delete Post
+DROP PROCEDURE IF EXISTS DeletePost$$
+CREATE PROCEDURE DeletePost(IN post_id INT)
+BEGIN
+    DELETE FROM posts WHERE id = post_id;
+END$$
+
+-- Get All Posts
+DROP PROCEDURE IF EXISTS GetAllPosts$$
+CREATE PROCEDURE GetAllPosts()
+BEGIN
+    SELECT * FROM posts;
+END$$
+
+-- Comments
+-- Create Comment
+DROP PROCEDURE IF EXISTS CreateComment$$
+CREATE PROCEDURE CreateComment(IN post_id INT, IN user_id INT, IN content TEXT)
+BEGIN
+    INSERT INTO comments (post_id, user_id, content) VALUES (post_id, user_id, content);
+END$$
+
+-- Get Comment by ID
+DROP PROCEDURE IF EXISTS GetCommentById$$
+CREATE PROCEDURE GetCommentById(IN comment_id INT)
+BEGIN
+    SELECT * FROM comments WHERE id = comment_id;
+END$$
+
+-- Update Comment
+DROP PROCEDURE IF EXISTS UpdateComment$$
+CREATE PROCEDURE UpdateComment(IN comment_id INT, IN new_content TEXT)
+BEGIN
+    UPDATE comments SET content = new_content WHERE id = comment_id;
+END$$
+
+-- Delete Comment
+DROP PROCEDURE IF EXISTS DeleteComment$$
+CREATE PROCEDURE DeleteComment(IN comment_id INT)
+BEGIN
+    DELETE FROM comments WHERE id = comment_id;
+END$$
+
+-- Get All Comments
+DROP PROCEDURE IF EXISTS GetAllComments$$
+CREATE PROCEDURE GetAllComments()
+BEGIN
+    SELECT * FROM comments;
+END$$
+
+
+
+DELIMITER ;
+
+
+CREATE OR REPLACE VIEW user_posts_and_comments AS
+SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content, comments.id AS comment_id, comments.content AS comment_content
+FROM posts
+LEFT JOIN comments ON posts.id = comments.post_id
+WHERE posts.user_id = ?;
+
+CREATE OR REPLACE VIEW posts_without_comments AS
+SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content
+FROM comments
+RIGHT JOIN posts ON comments.post_id = posts.id
+WHERE comments.id IS NULL;
+
+CREATE OR REPLACE VIEW all_posts_and_comments AS
+SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content, comments.id AS comment_id, comments.content AS comment_content
+FROM posts
+FULL JOIN comments ON posts.id = comments.post_id;
+
+SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content, comments.id AS comment_id, comments.content AS comment_content
+FROM posts
+INNER JOIN comments ON posts.id = comments.post_id
+WHERE posts.user_id = comments.user_id;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS delete_post_comments$$
+CREATE TRIGGER delete_post_comments
+AFTER DELETE ON posts
+FOR EACH ROW
+BEGIN
+    DELETE FROM comments WHERE post_id = OLD.id;
+END$$
+
+DELIMITER ;```
+--------------------------
+
+.\back\__pycache__\app.cpython-311.pyc:
+```

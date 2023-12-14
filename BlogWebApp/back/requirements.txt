@@ -1,0 +1,19 @@
+**Project Name:** Text-Only Blog Site Backend
+
+**Project Requirements:**
+- Must exclusively use Flask and pymysql for the project.
+- Everything python is must be placed in only one file, app.py
+- Must have one schema.sql file which contains all the SQL code including views, stored procedures, and triggers used in the project.
+- Must use th Database Username: root, Database Password: root.
+- Must implement the following Object-Oriented Programming principles: Classes and Objects, Inheritance, and Exception Handling.
+- Must use MySQL Triggers without using SIGNAL.
+- Must use MySQL Views.
+- Must use MySQL Stored Procedures.
+- Must employ all types of MySQL Joins (INNER, LEFT, RIGHT, FULL, SELF).
+- Must implement CRUD (Create, Read, Update, Delete) operations utilizing all of the following: Stored Procedures, Triggers, Views, and Joins.
+- Must utilize Data Structures and Control Flow.
+- Must exclusively use MariaDB syntax.
+- The database, procedures, triggers, and views must be automatically created if they do not exist upon running the project.
+- Must have API endpoints using Json bodies.
+- Must be absolutely error free.
+- Everything in schema.sql must be used.

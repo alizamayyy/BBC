@@ -1,0 +1,26 @@
+
+HTTP METHOD | 127.0.0.1:5000/endpoint | input/output
+--- | --- | ---
+POST | /users | input: username, password; output: message
+GET | /users/<int:user_id> | input: user_id; output: username, password
+PUT | /users/<int:user_id> | input: user_id, new_username, new_password; output: message
+DELETE | /users/<int:user_id> | input: user_id; output: message
+POST | /login | input: username, password; output: username, password, id
+GET | /users | input: none; output: list of users
+POST | /posts | input: title, content, user_id; output: message
+GET | /posts/<int:post_id> | input: post_id; output: title, content, user_id
+PUT | /posts/<int:post_id> | input: post_id, new_title, new_content; output: message
+DELETE | /posts/<int:post_id> | input: post_id; output: message
+GET | /posts | input: none; output: list of posts
+POST | /comments | input: post_id, user_id, content; output: message
+GET | /comments/<int:comment_id> | input: comment_id; output: post_id, user_id, content
+PUT | /comments/<int:comment_id> | input: comment_id, new_content; output: message
+DELETE | /comments/<int:comment_id> | input: comment_id; output: message
+GET | /comments | input: none; output: list of comments
+GET | /users/<int:user_id>/posts_and_comments | input: user_id; output: list of posts and comments by user
+GET | /posts/recent | input: none; output: list of 10 most recent posts
+GET | /posts/most_commented | input: none; output: list of posts ordered by comment count
+GET | /users/<int:user_id>/posts_comments | input: user_id; output: list of posts and comments by user
+GET | /posts/without_comments | input: none; output: list of posts without any comments
+GET | /posts_comments/all | input: none; output: list of all posts and comments
+GET | /posts/authors_comments | input: none; output: list of posts, authors, and comments
