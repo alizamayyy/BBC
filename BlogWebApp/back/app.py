@@ -5,7 +5,6 @@ import pymysql
 app = Flask(__name__)
 CORS(app)
 
-
 def create_connection():
     try:
         db = pymysql.connect(
@@ -16,7 +15,6 @@ def create_connection():
         print("Connection failed:", e)
         return None
 
-
 class User:
     def __init__(self, username, password, id=None):
         self.id = id
@@ -24,67 +22,72 @@ class User:
         self.password = password
 
     def save(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("CreateUser", (self.username, self.password))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("CreateUser", (self.username, self.password))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_by_id(cls, user_id):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetUserById", (user_id,))
-                user_data = cursor.fetchone()
-                if user_data:
-                    return cls(user_data[1], user_data[2], user_data[0])
-                return None
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetUserById", (user_id,))
+            user_data = cursor.fetchone()
+            if user_data:
+                return cls(user_data[1], user_data[2], user_data[0])
+            return None
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def update(self, new_username, new_password):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("UpdateUser", (self.id, new_username, new_password))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("UpdateUser", (self.id, new_username, new_password))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def delete(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("DeleteUser", (self.id,))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("DeleteUser", (self.id,))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_all(cls):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetAllUsers")
-                users_data = cursor.fetchall()
-                users = [
-                    {"id": user[0], "username": user[1], "password": user[2]}
-                    for user in users_data
-                ]
-                return users
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetAllUsers")
+            users_data = cursor.fetchall()
+            users = [
+                {"id": user[0], "username": user[1], "password": user[2]}
+                for user in users_data
+            ]
+            return users
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def login(cls, username, password):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetUserByUsername", (username,))
-                user_data = cursor.fetchone()
-                if user_data and user_data[2] == password:
-                    return cls(user_data[1], user_data[2], user_data[0])
-                return None
-            except pymysql.Error as e:
-                print("Query failed:", e)
-
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetUserByUsername", (username,))
+            user_data = cursor.fetchone()
+            if user_data and user_data[2] == password:
+                return cls(user_data[1], user_data[2], user_data[0])
+            return None
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
 class Post:
     def __init__(self, title, content, user_id, id=None):
@@ -94,62 +97,66 @@ class Post:
         self.user_id = user_id
 
     def save(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("CreatePost", (self.title, self.content, self.user_id))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("CreatePost", (self.title, self.content, self.user_id))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_by_id(cls, post_id):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetPostById", (post_id,))
-                post_data = cursor.fetchone()
-                if post_data:
-                    return cls(post_data[1], post_data[2], post_data[3], post_data[0])
-                return None
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetPostById", (post_id,))
+            post_data = cursor.fetchone()
+            if post_data:
+                return cls(post_data[1], post_data[2], post_data[3], post_data[0])
+            return None
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def update(self, new_title, new_content):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("UpdatePost", (self.id, new_title, new_content))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("UpdatePost", (self.id, new_title, new_content))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def delete(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("DeletePost", (self.id,))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("DeletePost", (self.id,))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_all(cls):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetAllPosts")
-                posts_data = cursor.fetchall()
-                posts = [
-                    {
-                        "id": post[0],
-                        "title": post[1],
-                        "content": post[2],
-                        "user_id": post[3],
-                        "created_at": post[4],
-                        "updated_at": post[5],
-                    }
-                    for post in posts_data
-                ]
-                return posts
-            except pymysql.Error as e:
-                print("Query failed:", e)
-
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetAllPosts")
+            posts_data = cursor.fetchall()
+            posts = [
+                {
+                    "id": post[0],
+                    "title": post[1],
+                    "content": post[2],
+                    "user_id": post[3],
+                    "created_at": post[4],
+                    "updated_at": post[5],
+                }
+                for post in posts_data
+            ]
+            return posts
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
 class Comment:
     def __init__(self, post_id, user_id, content, id=None):
@@ -159,67 +166,64 @@ class Comment:
         self.content = content
 
     def save(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc(
-                    "CreateComment", (self.post_id, self.user_id, self.content)
-                )
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("CreateComment", (self.post_id, self.user_id, self.content))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_by_id(cls, comment_id):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetCommentById", (comment_id,))
-                comment_data = cursor.fetchone()
-                if comment_data:
-                    return cls(
-                        comment_data[1],
-                        comment_data[2],
-                        comment_data[3],
-                        comment_data[0],
-                    )
-                return None
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetCommentById", (comment_id,))
+            comment_data = cursor.fetchone()
+            if comment_data:
+                return cls(comment_data[1], comment_data[2], comment_data[3], comment_data[0])
+            return None
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def update(self, new_content):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("UpdateComment", (self.id, new_content))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("UpdateComment", (self.id, new_content))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     def delete(self):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("DeleteComment", (self.id,))
-                create_connection().commit()
-            except pymysql.Error as e:
-                print("Query failed:", e)
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("DeleteComment", (self.id,))
+            db.commit()
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
     @classmethod
     def get_all(cls):
-        with create_connection().cursor() as cursor:
-            try:
-                cursor.callproc("GetAllComments")
-                comments_data = cursor.fetchall()
-                comments = [
-                    {
-                        "id": comment[0],
-                        "post_id": comment[1],
-                        "user_id": comment[2],
-                        "content": comment[3],
-                    }
-                    for comment in comments_data
-                ]
-                return comments
-            except pymysql.Error as e:
-                print("Query failed:", e)
-
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetAllComments")
+            comments_data = cursor.fetchall()
+            comments = [
+                {
+                    "id": comment[0],
+                    "post_id": comment[1],
+                    "user_id": comment[2],
+                    "content": comment[3],
+                }
+                for comment in comments_data
+            ]
+            return comments
+        except pymysql.Error as e:
+            print("Query failed:", e)
 
 @app.route("/users", methods=["POST"])
 def create_user():
@@ -230,14 +234,12 @@ def create_user():
     user.save()
     return jsonify({"message": "User created successfully"}), 201
 
-
 @app.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.get_by_id(user_id)
     if user:
         return jsonify({"username": user.username, "password": user.password}), 200
     return jsonify({"message": "User not found"}), 404
-
 
 @app.route("/users/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
@@ -250,7 +252,6 @@ def update_user(user_id):
         return jsonify({"message": "User updated successfully"}), 200
     return jsonify({"message": "User not found"}), 404
 
-
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
     user = User.get_by_id(user_id)
@@ -258,7 +259,6 @@ def delete_user(user_id):
         user.delete()
         return jsonify({"message": "User deleted successfully"}), 200
     return jsonify({"message": "User not found"}), 404
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -277,12 +277,10 @@ def login():
     else:
         return jsonify({"message": "Login failed. Please check your credentials"}), 401
 
-
 @app.route("/users", methods=["GET"])
 def get_all_users():
     users = User.get_all()
     return jsonify(users), 200
-
 
 @app.route("/posts", methods=["POST"])
 def create_post():
@@ -293,7 +291,6 @@ def create_post():
     post = Post(title, content, user_id)
     post.save()
     return jsonify({"message": "Post created successfully"}), 201
-
 
 @app.route("/posts/<int:post_id>", methods=["GET"])
 def get_post(post_id):
@@ -307,7 +304,6 @@ def get_post(post_id):
         )
     return jsonify({"message": "Post not found"}), 404
 
-
 @app.route("/posts/<int:post_id>", methods=["PUT"])
 def update_post(post_id):
     data = request.get_json()
@@ -319,7 +315,6 @@ def update_post(post_id):
         return jsonify({"message": "Post updated successfully"}), 200
     return jsonify({"message": "Post not found"}), 404
 
-
 @app.route("/posts/<int:post_id>", methods=["DELETE"])
 def delete_post(post_id):
     post = Post.get_by_id(post_id)
@@ -328,12 +323,10 @@ def delete_post(post_id):
         return jsonify({"message": "Post deleted successfully"}), 200
     return jsonify({"message": "Post not found"}), 404
 
-
 @app.route("/posts", methods=["GET"])
 def get_all_posts():
     posts = Post.get_all()
     return jsonify(posts), 200
-
 
 @app.route("/comments", methods=["POST"])
 def create_comment():
@@ -344,7 +337,6 @@ def create_comment():
     comment = Comment(post_id, user_id, content)
     comment.save()
     return jsonify({"message": "Comment created successfully"}), 201
-
 
 @app.route("/comments/<int:comment_id>", methods=["GET"])
 def get_comment(comment_id):
@@ -362,7 +354,6 @@ def get_comment(comment_id):
         )
     return jsonify({"message": "Comment not found"}), 404
 
-
 @app.route("/comments/<int:comment_id>", methods=["PUT"])
 def update_comment(comment_id):
     data = request.get_json()
@@ -373,7 +364,6 @@ def update_comment(comment_id):
         return jsonify({"message": "Comment updated successfully"}), 200
     return jsonify({"message": "Comment not found"}), 404
 
-
 @app.route("/comments/<int:comment_id>", methods=["DELETE"])
 def delete_comment(comment_id):
     comment = Comment.get_by_id(comment_id)
@@ -382,12 +372,10 @@ def delete_comment(comment_id):
         return jsonify({"message": "Comment deleted successfully"}), 200
     return jsonify({"message": "Comment not found"}), 404
 
-
 @app.route("/comments", methods=["GET"])
 def get_all_comments():
     comments = Comment.get_all()
     return jsonify(comments), 200
-
 
 if __name__ == "__main__":
     app.run(debug=True)
