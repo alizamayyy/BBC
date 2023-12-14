@@ -1,7 +1,11 @@
+    -- Create Database
+    
     CREATE DATABASE IF NOT EXISTS text_blog;
 
+    -- Use Database
     USE text_blog;
 
+    -- Create Tables
     CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) UNIQUE NOT NULL,
@@ -30,42 +34,11 @@
     );
 
 
-    DELIMITER $$
-
-    DROP TRIGGER IF EXISTS update_post_updated_at$$
-    CREATE TRIGGER update_post_updated_at
-    BEFORE UPDATE ON posts
-    FOR EACH ROW
-    BEGIN
-        SET NEW.updated_at = CURRENT_TIMESTAMP;
-    END$$
-
-    DROP TRIGGER IF EXISTS update_comment_updated_at$$
-    CREATE TRIGGER update_comment_updated_at
-    BEFORE UPDATE ON comments
-    FOR EACH ROW
-    BEGIN
-        SET NEW.updated_at = CURRENT_TIMESTAMP;
-    END$$
-
-    DELIMITER ;
-
-
-    CREATE OR REPLACE VIEW most_commented_posts AS
-    SELECT posts.*, COUNT(*) AS comment_count
-    FROM posts
-    INNER JOIN comments ON posts.id = comments.post_id
-    GROUP BY posts.id
-    ORDER BY comment_count DESC;
-
-    CREATE OR REPLACE VIEW recent_posts AS
-    SELECT * FROM posts
-    ORDER BY created_at DESC
-    LIMIT 10;
-
-    DELIMITER $$
-
+    -- CRUD Stored Procedures
     -- Users
+
+    DELIMITER $$
+    
     -- Create User
     DROP PROCEDURE IF EXISTS CreateUser$$
     CREATE PROCEDURE CreateUser(IN username VARCHAR(255), IN password VARCHAR(255))
@@ -180,9 +153,45 @@
         SELECT * FROM comments;
     END$$
 
+    DELIMITER ;
 
+
+    -- Triggers
+    
+    DELIMITER $$
+
+    DROP TRIGGER IF EXISTS update_post_updated_at$$
+    CREATE TRIGGER update_post_updated_at
+    BEFORE UPDATE ON posts
+    FOR EACH ROW
+    BEGIN
+        SET NEW.updated_at = CURRENT_TIMESTAMP;
+    END$$
+
+    DROP TRIGGER IF EXISTS update_comment_updated_at$$
+    CREATE TRIGGER update_comment_updated_at
+    BEFORE UPDATE ON comments
+    FOR EACH ROW
+    BEGIN
+        SET NEW.updated_at = CURRENT_TIMESTAMP;
+    END$$
 
     DELIMITER ;
+
+
+    -- Views
+
+    CREATE OR REPLACE VIEW most_commented_posts AS
+    SELECT posts.*, COUNT(*) AS comment_count
+    FROM posts
+    INNER JOIN comments ON posts.id = comments.post_id
+    GROUP BY posts.id
+    ORDER BY comment_count DESC;
+
+    CREATE OR REPLACE VIEW recent_posts AS
+    SELECT * FROM posts
+    ORDER BY created_at DESC
+    LIMIT 10;
 
     CREATE OR REPLACE VIEW posts_without_comments AS
     SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content

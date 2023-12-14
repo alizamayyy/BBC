@@ -377,5 +377,98 @@ def get_all_comments():
     comments = Comment.get_all()
     return jsonify(comments), 200
 
+# Extra views
+
+@app.route("/most_commented_posts", methods=["GET"])
+def get_most_commented_posts():
+    db = create_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM most_commented_posts")
+        most_commented_posts = cursor.fetchall()
+        most_commented_posts = [
+            {
+                "id": post[0],
+                "title": post[1],
+                "content": post[2],
+                "user_id": post[3],
+                "created_at": post[4],
+                "updated_at": post[5],
+                "comment_count": post[6],
+            }
+            for post in most_commented_posts
+        ]
+        return jsonify(most_commented_posts), 200
+    except pymysql.Error as e:
+        print("Query failed:", e)
+        return jsonify({"message": "Something went wrong"}), 500
+
+@app.route("/recent_posts", methods=["GET"])
+def get_recent_posts():
+    db = create_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM recent_posts")
+        recent_posts = cursor.fetchall()
+        recent_posts = [
+            {
+                "id": post[0],
+                "title": post[1],
+                "content": post[2],
+                "user_id": post[3],
+                "created_at": post[4],
+                "updated_at": post[5],
+            }
+            for post in recent_posts
+        ]
+        return jsonify(recent_posts), 200
+    except pymysql.Error as e:
+        print("Query failed:", e)
+        return jsonify({"message": "Something went wrong"}), 500
+
+@app.route("/posts_without_comments", methods=["GET"])
+def get_posts_without_comments():
+    db = create_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM posts_without_comments")
+        posts_without_comments = cursor.fetchall()
+        posts_without_comments = [
+            {
+                "post_id": post[0],
+                "post_title": post[1],
+                "post_content": post[2],
+            }
+            for post in posts_without_comments
+        ]
+        return jsonify(posts_without_comments), 200
+    except pymysql.Error as e:
+        print("Query failed:", e)
+        return jsonify({"message": "Something went wrong"}), 500
+
+@app.route("/posts_authors_comments", methods=["GET"])
+def get_posts_authors_comments():
+    db = create_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT * FROM posts_authors_comments")
+        posts_authors_comments = cursor.fetchall()
+        posts_authors_comments = [
+            {
+                "post_id": post[0],
+                "post_title": post[1],
+                "post_content": post[2],
+                "author_username": post[3],
+                "comment_id": post[4],
+                "comment_content": post[5],
+                "commenter_id": post[6],
+            }
+            for post in posts_authors_comments
+        ]
+        return jsonify(posts_authors_comments), 200
+    except pymysql.Error as e:
+        print("Query failed:", e)
+        return jsonify({"message": "Something went wrong"}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
