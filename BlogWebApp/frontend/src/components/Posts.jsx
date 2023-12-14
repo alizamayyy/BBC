@@ -417,7 +417,7 @@ function Posts() {
                       </div>
                     )}
                     <div className="flex flex-col ml-14 mr-6">
-                      <h3 className="text-white text-lg font-semibold mb-2">
+                      <h3 className="text-white text-lg font-semibold mb-2 mt-4">
                         Comments
                       </h3>
                       {getCommentsForPost(post.id).map((comment) => (
@@ -443,7 +443,7 @@ function Posts() {
                               </p>
                             </div>
                           </div>
-                          <div className="ml-12">
+                          <div className="ml-12 mb-2">
                             <p className="text-white text-sm">
                               {comment.content}
                             </p>
