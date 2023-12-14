@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Navbar from "./navbar";
+import ProfileCard from "./profileCard";
+import ActiveUsersCard from "./activeUsersCard";
+import Card from "@mui/material/Card";
 
 function Posts() {
   const [user, setUser] = useState(null);
@@ -274,118 +278,265 @@ function Posts() {
   };
 
   return (
-    <div>
-      <h1>Posts</h1>
-      <form>
-        <input
-          type="text"
-          placeholder="Title"
-          value={newPost.title}
-          onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-        />
-        <textarea
-          placeholder="Content"
-          value={newPost.content}
-          onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-        />
-        <button type="button" onClick={handleCreatePost}>
-          Create Post
-        </button>
-      </form>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
-            <p>Posted by: {usernames[post.user_id]}</p>
-            <p>Created At: {post.created_at}</p>
-            {post.updated_at && <p>Updated At: {post.updated_at}</p>}
-            {editingPost === post.id ? (
-              <div>
-                <input
-                  type="text"
-                  name="title"
-                  value={editedPostData.title}
-                  onChange={handleEditInputChange}
-                />
-                <textarea
-                  name="content"
-                  value={editedPostData.content}
-                  onChange={handleEditInputChange}
-                />
-                <button onClick={handleEditSubmit}>Submit</button>
-              </div>
-            ) : (
-              <div>
-                {user && user.id === post.user_id && (
-                  <>
-                    <button onClick={() => handleUpdatePost(post.id)}>
-                      Update Post
-                    </button>
-                    <button onClick={() => handleDeletePost(post.id)}>
-                      Delete Post
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
+    <div
+      className="h-max"
+      style={{
+        background:
+          "linear-gradient(0deg, #000517 0%, #000517 50%, #1b1a38 100%)",
+      }}
+    >
+      <Navbar />
+      <div className="mt-24 flex flex-row space-x-16 justify-center">
+        <ProfileCard />
+        <Card
+          className="w-2/5 overflow-scroll flex flex-col justify-center items-center p-4"
+          sx={{
+            backgroundColor: "#000517",
+            borderRadius: "20px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <div className="flex flex-col w-5/6">
             <div>
-              {getCommentsForPost(post.id).map((comment) => (
-                <div key={comment.id}>
-                  <p>{comment.content}</p>
-                  <p>Commented by: {usernames[comment.user_id]}</p>
-                  {editingComment === comment.id ? (
-                    <div>
-                      <textarea
-                        name="content"
-                        value={editedCommentData.content}
-                        onChange={(e) =>
-                          handleEditCommentInputChange(e, comment.id)
-                        }
-                      />
-                      <button
-                        onClick={() => handleEditCommentSubmit(comment.id)}
+              <form>
+                <div className="flex flex-col space-y-5 ">
+                  <h1 className="font-bold text-4xl text-center mb-4 mt-4 text-white">
+                    Posts
+                  </h1>
+                  <input
+                    className="py-2.5 px-4 rounded-lg"
+                    type="text"
+                    placeholder="Title"
+                    value={newPost.title}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, title: e.target.value })
+                    }
+                  />
+                  <textarea
+                    className="py-2.5 px-4 rounded-lg"
+                    placeholder="Content"
+                    value={newPost.content}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, content: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="">
+                  <button
+                    type="button"
+                    className="bg-[#6788ff] hover:bg-blue-700 w-2/5 text-white font-bold px-4 rounded-xl focus:outline-none focus:shadow-outline h-9 mb-4 mt-5 float-right"
+                    onClick={handleCreatePost}
+                  >
+                    Create Post
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="text-white flex flex-col">
+              <ul>
+                {posts.map((post) => (
+                  <Card
+                    className="mb-4 mt-4 p-6"
+                    style={{ backgroundColor: "#000826", borderRadius: "20px" }}
+                    key={post.id}
+                  >
+                    <div className="flex flex-row space-x-2 mb-4 text-white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-12 h-12"
                       >
-                        Submit
-                      </button>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <div>
+                        <p className="font-bold text-lg">
+                          {usernames[post.user_id]}
+                        </p>
+                        <p className="font-light text-sm italic">
+                          {post.created_at}
+                        </p>
+                      </div>
                     </div>
-                  ) : (
-                    <div>
-                      {user && user.id === comment.user_id && (
-                        <>
-                          <button
-                            onClick={() => handleUpdateComment(comment.id)}
-                          >
-                            Update Comment
-                          </button>
-                          <button
-                            onClick={() => handleDeleteComment(comment.id)}
-                          >
-                            Delete Comment
-                          </button>
-                        </>
+                    <div className="ml-14 text-white">
+                      <h2 className="font-bold text-2xl mb-1">{post.title}</h2>
+                      <p className="mb-4">{post.content}</p>
+
+                      {post.updated_at && (
+                        <p className="font-light text-xs italic">
+                          Updated: {post.updated_at}
+                        </p>
                       )}
                     </div>
-                  )}
-                </div>
-              ))}
-              <textarea
-                placeholder="Add a comment"
-                value={commentStates[post.id]?.content || ""}
-                onChange={(e) =>
-                  setCommentStates((prevStates) => ({
-                    ...prevStates,
-                    [post.id]: { content: e.target.value },
-                  }))
-                }
-              />
-              <button onClick={() => handleCreateComment(post.id)}>
-                Add Comment
-              </button>
+                    {editingPost === post.id ? (
+                      <div className="flex flex-col space-y-2">
+                        <input
+                          className="py-2.5 px-4 rounded-lg w-2/3 mt-4 ml-12"
+                          type="text"
+                          name="title"
+                          value={editedPostData.title}
+                          onChange={handleEditInputChange}
+                        />
+                        <textarea
+                          className="py-2.5 px-4 rounded-lg w-2/3 ml-12"
+                          name="content"
+                          value={editedPostData.content}
+                          onChange={handleEditInputChange}
+                        />
+                        <button
+                          className="bg-[#6788ff] hover:bg-blue-700 w-1/5 text-white text-xs font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 ml-auto mr-28"
+                          onClick={handleEditSubmit}
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col">
+                        {user && user.id === post.user_id && (
+                          <div>
+                            <button
+                              className="bg-red-500 hover:bg-red-700 w-1/4 ml-2 mr-12 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-5 float-right"
+                              onClick={() => handleDeletePost(post.id)}
+                            >
+                              Delete Post
+                            </button>
+                            <button
+                              className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-5 float-right"
+                              onClick={() => handleUpdatePost(post.id)}
+                            >
+                              Update Post
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div className="flex flex-col ml-14 mr-6">
+                      <h3 className="text-white text-lg font-semibold mb-2">
+                        Comments
+                      </h3>
+                      {getCommentsForPost(post.id).map((comment) => (
+                        <div key={comment.id}>
+                          <div className="flex flex-row space-x-2 ml-4 text-white">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="w-6 h-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            <div>
+                              <p className="font-bold text-md">
+                                {usernames[comment.user_id]}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="ml-12">
+                            <p className="text-white text-sm">
+                              {comment.content}
+                            </p>
+                          </div>
+
+                          {editingComment === comment.id ? (
+                            <div>
+                              <textarea
+                                className="py-2.5 px-4 rounded-lg w-2/3 ml-12 mt-2"
+                                name="content"
+                                value={editedCommentData.content}
+                                onChange={(e) =>
+                                  handleEditCommentInputChange(e, comment.id)
+                                }
+                              />
+                              <button
+                                className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-1 ml-44"
+                                onClick={() =>
+                                  handleEditCommentSubmit(comment.id)
+                                }
+                              >
+                                Submit
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              {user && user.id === comment.user_id && (
+                                <div className="ml-11">
+                                  <button
+                                    className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 "
+                                    onClick={() =>
+                                      handleUpdateComment(comment.id)
+                                    }
+                                  >
+                                    Update Comment
+                                  </button>
+                                  <button
+                                    className="bg-red-500 hover:bg-red-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 ml-1"
+                                    onClick={() =>
+                                      handleDeleteComment(comment.id)
+                                    }
+                                  >
+                                    Delete Comment
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      <div className="flex flex-row ml-4 mt-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-6 h-6 text-white"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <textarea
+                          className="py-2.5 px-4 rounded-lg w-2/3 ml-2"
+                          placeholder="Add a comment"
+                          value={commentStates[post.id]?.content || ""}
+                          onChange={(e) =>
+                            setCommentStates((prevStates) => ({
+                              ...prevStates,
+                              [post.id]: { content: e.target.value },
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <button
+                        className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 ml-48"
+                        onClick={() => handleCreateComment(post.id)}
+                      >
+                        Add Comment
+                      </button>
+                    </div>
+                  </Card>
+                ))}
+              </ul>
             </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        </Card>
+        <ActiveUsersCard />
+      </div>
     </div>
   );
 }
