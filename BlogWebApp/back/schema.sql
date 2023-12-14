@@ -190,23 +190,6 @@
     RIGHT JOIN posts ON comments.post_id = posts.id
     WHERE comments.id IS NULL;
 
-    SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content, comments.id AS comment_id, comments.content AS comment_content
-    FROM posts
-    INNER JOIN comments ON posts.id = comments.post_id
-    WHERE posts.user_id = comments.user_id;
-
-    DELIMITER $$
-
-    DROP TRIGGER IF EXISTS delete_post_comments$$
-    CREATE TRIGGER delete_post_comments
-    AFTER DELETE ON posts
-    FOR EACH ROW
-    BEGIN
-        DELETE FROM comments WHERE post_id = OLD.id;
-    END$$
-
-    DELIMITER ;
-
     CREATE OR REPLACE VIEW posts_authors_comments AS
     SELECT 
         p.id AS post_id, 
