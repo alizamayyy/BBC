@@ -447,29 +447,6 @@ def get_most_commented_posts():
         print("Query failed:", e)
         return jsonify({"message": "Something went wrong"}), 500
 
-@app.route("/recent_posts", methods=["GET"])
-def get_recent_posts():
-    db = create_connection()
-    cursor = db.cursor()
-    try:
-        cursor.execute("SELECT * FROM recent_posts")
-        recent_posts = cursor.fetchall()
-        recent_posts = [
-            {
-                "id": post[0],
-                "title": post[1],
-                "content": post[2],
-                "user_id": post[3],
-                "created_at": post[4],
-                "updated_at": post[5],
-            }
-            for post in recent_posts
-        ]
-        return jsonify(recent_posts), 200
-    except pymysql.Error as e:
-        print("Query failed:", e)
-        return jsonify({"message": "Something went wrong"}), 500
-
 @app.route("/posts_without_comments", methods=["GET"])
 def get_posts_without_comments():
     db = create_connection()

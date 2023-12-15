@@ -23,7 +23,7 @@ const ProfileCard = () => {
 
   return (
     <Card
-      className="w-1/5 h-96 flex flex-col justify-center items-center p-8"
+      className="w-full h-70 flex flex-col justify-center items-center p-8 flex-grow-0"
       sx={{
         backgroundColor: "#1b1a38",
         borderRadius: "20px",

@@ -19,6 +19,7 @@ function Posts() {
   const [editingComment, setEditingComment] = useState(null);
   const [editedCommentData, setEditedCommentData] = useState({ content: "" });
   const [usernames, setUsernames] = useState({}); // New state for storing usernames
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
@@ -31,15 +32,28 @@ function Posts() {
 
   useEffect(() => {
     fetchPosts();
-  }, [newPost, editingPost]);
+  }, [newPost, editingPost, filter]);
 
   useEffect(() => {
     fetchComments();
   }, []);
 
   const fetchPosts = () => {
+    let endpoint = "";
+
+    switch (filter) {
+      case "Most Commented Posts":
+        endpoint = "/most_commented_posts";
+        break;
+      case "Posts Without Comments":
+        endpoint = "/posts_without_comments";
+        break;
+      default:
+        endpoint = "/posts"; // replace with your default endpoint
+    }
+
     axios
-      .get("http://localhost:5000/posts")
+      .get("http://localhost:5000" + `${endpoint}`)
       .then((response) => {
         const sortedPosts = response.data.sort((a, b) => {
           // Sort in descending order based on the 'created_at' timestamp
@@ -78,6 +92,7 @@ function Posts() {
       return;
     }
     // Otherwise, make a request to the API
+
     axios
       .get(`http://localhost:5000/users/${user_id}`)
       .then((response) => {
@@ -281,6 +296,10 @@ function Posts() {
     return comments.filter((comment) => comment.post_id === postId);
   };
 
+  const handleFilterClick = (filterName) => {
+    setFilter(filterName);
+  };
+
   return (
     <div
       className="h-max"
@@ -291,7 +310,37 @@ function Posts() {
     >
       <Navbar />
       <div className="mt-24 flex flex-row space-x-16 justify-center">
-        <ProfileCard />
+        <div className="w-1/5 flex flex-col">
+          <ProfileCard />
+          <Card
+            sx={{
+              height: "fit-content",
+              backgroundColor: "#1b1a38",
+              borderRadius: "20px",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              marginTop: "20px",
+            }}
+          >
+            <div className="flex flex-col justify-center mt-4 items-center pb-5">
+              <h2 className="font-bold text-2xl text-center mb-4 mt-4 text-white">
+                Filters
+              </h2>
+              <button
+                onClick={() => handleFilterClick("Most Commented Posts")}
+                className="my-5 text-white"
+              >
+                Most Commented Posts
+              </button>
+              <hr className="w-4/5" />
+              <button
+                onClick={() => handleFilterClick("Posts Without Comments")}
+                className="my-5 text-white"
+              >
+                Posts Without Comments
+              </button>
+            </div>
+          </Card>
+        </div>
         <Card
           className="w-2/5 overflow-scroll flex flex-col justify-center items-center p-4"
           sx={{
@@ -336,6 +385,12 @@ function Posts() {
                 </div>
               </form>
             </div>
+            {/* Display the filter if present */}
+            {filter && (
+              <div className="mt-4 mb-4">
+                <h2 className="text-white text-lg font-semibold">{filter}:</h2>
+              </div>
+            )}
             <div className="text-white flex flex-col">
               <ul>
                 {posts.map((post) => (
@@ -477,7 +532,7 @@ function Posts() {
                               {user && user.id === comment.user_id && (
                                 <div className="ml-11">
                                   <button
-                                    className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 "
+                                    className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline mb-4 mt-3"
                                     onClick={() =>
                                       handleUpdateComment(comment.id)
                                     }
@@ -485,7 +540,7 @@ function Posts() {
                                     Update Comment
                                   </button>
                                   <button
-                                    className="bg-red-500 hover:bg-red-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 ml-1"
+                                    className="bg-red-500 hover:bg-red-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline mb-4 mt-3 ml-1"
                                     onClick={() =>
                                       handleDeleteComment(comment.id)
                                     }

@@ -205,11 +205,6 @@
     GROUP BY posts.id
     ORDER BY comment_count DESC;
 
-    CREATE OR REPLACE VIEW recent_posts AS
-    SELECT * FROM posts
-    ORDER BY created_at DESC
-    LIMIT 10;
-
     CREATE OR REPLACE VIEW posts_without_comments AS
     SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content
     FROM comments
