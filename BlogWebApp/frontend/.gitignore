@@ -22,7 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# helper jupyter notebook files
-
-*.ipynb
