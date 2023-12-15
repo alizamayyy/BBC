@@ -155,6 +155,23 @@
 
     DELIMITER ;
 
+    -- Get Number of Posts via User ID
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS GetPostCountByUserId$$
+    CREATE PROCEDURE GetPostCountByUserId(IN user_id INT)
+    BEGIN
+        SELECT COUNT(*) FROM posts WHERE user_id = user_id;
+    END$$
+    DELIMITER ;
+
+    -- Get All Posts via User ID
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS GetAllPostsByUserId$$
+    CREATE PROCEDURE GetAllPostsByUserId(IN user_id INT)
+    BEGIN
+        SELECT * FROM posts WHERE user_id = user_id;
+    END$$
+    DELIMITER ;
 
     -- Triggers
     

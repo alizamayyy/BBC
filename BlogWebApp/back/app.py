@@ -89,6 +89,40 @@ class User:
         except pymysql.Error as e:
             print("Query failed:", e)
 
+    @classmethod
+    def get_post_count_by_user_id(cls, user_id):
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetPostCountByUserId", (user_id,))
+            post_count = cursor.fetchone()[0]
+            return post_count
+        except pymysql.Error as e:
+            print("Query failed:", e)
+
+    @classmethod
+    def get_all_posts_by_user_id(cls, user_id):
+        db = create_connection()
+        cursor = db.cursor()
+        try:
+            cursor.callproc("GetAllPostsByUserId", (user_id,))
+            posts_data = cursor.fetchall()
+            posts = [
+                {
+                    "id": post[0],
+                    "title": post[1],
+                    "content": post[2],
+                    "user_id": post[3],
+                    "created_at": post[4],
+                    "updated_at": post[5],
+                }
+                for post in posts_data
+            ]
+            return posts
+        except pymysql.Error as e:
+            print("Query failed:", e)
+    
+
 class Post:
     def __init__(self, title, content, user_id, id=None):
         self.id = id
@@ -259,6 +293,16 @@ def delete_user(user_id):
         user.delete()
         return jsonify({"message": "User deleted successfully"}), 200
     return jsonify({"message": "User not found"}), 404
+
+@app.route("/users/<int:user_id>/post_count", methods=["GET"])
+def get_post_count_by_user_id(user_id):
+    post_count = User.get_post_count_by_user_id(user_id)
+    return jsonify({"post_count": post_count}), 200
+
+@app.route("/users/<int:user_id>/posts", methods=["GET"])
+def get_all_posts_by_user_id(user_id):
+    posts = User.get_all_posts_by_user_id(user_id)
+    return jsonify(posts), 200
 
 @app.route("/login", methods=["POST"])
 def login():
