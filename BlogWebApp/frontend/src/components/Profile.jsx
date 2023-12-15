@@ -3,7 +3,6 @@ import axios from "axios";
 import Card from "@mui/material/Card";
 import Navbar from "./navbar";
 import ActiveUsersCard from "./activeUsersCard";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -24,6 +23,8 @@ const Profile = () => {
   const [password, setPassword] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [editingPost, setEditingPost] = useState(null);
+  const [editedPostData, setEditedPostData] = useState({});
 
   // Retrieve the currently logged-in user from localStorage
   const userData = JSON.parse(localStorage.getItem("user"));
@@ -46,6 +47,35 @@ const Profile = () => {
         .catch((error) => console.error("Error fetching posts:", error));
     }
   }, [userData.id]);
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedPostData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const updatedPost = {
+        title: editedPostData.title,
+        content: editedPostData.content,
+      };
+
+      await axios.put(
+        `http://localhost:5000/posts/${editingPost}`,
+        updatedPost
+      );
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === editingPost ? { ...post, ...updatedPost } : post
+        )
+      );
+
+      setEditingPost(null); // Here you have a typo: setEditPost instead of setEditingPost
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
+  };
 
   // Handle the edit user dialog
   const handleEditUserOpen = () => {
@@ -133,6 +163,44 @@ const Profile = () => {
     setDeletePost(false);
   };
 
+  const handleEditPost = (postId) => {
+    const postToEdit = posts.find((post) => post.id === postId);
+
+    if (postToEdit && user && postToEdit.user_id === user.id) {
+      setEditingPost(postId);
+      setEditedPostData({
+        title: postToEdit.title,
+        content: postToEdit.content,
+      });
+    } else {
+      console.error("You do not have permission to edit this post.");
+    }
+  };
+
+  const handleDeletePost = (postId) => {
+    const postToDelete = posts.find((post) => post.id === postId);
+
+    if (postToDelete && user && postToDelete.user_id === user.id) {
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this post?"
+      );
+
+      if (confirmed) {
+        axios
+          .delete(`http://localhost:5000/posts/${postId}`)
+          .then(() => {
+            const updatedPosts = posts.filter((post) => post.id !== postId);
+            setPosts(updatedPosts);
+          })
+          .catch((error) => {
+            console.error("Error deleting post:", error);
+          });
+      }
+    } else {
+      console.error("You do not have permission to delete this post.");
+    }
+  };
+
   const handleDeletePostSubmit = () => {
     axios
       .delete(`http://localhost:5000/posts/${selectedPost.id}`)
@@ -182,22 +250,20 @@ const Profile = () => {
           <h1 className="text-white text-2xl font-bold">{user?.username}</h1>
           <p className="text-white">Posts: {postCount}</p>
           <div className="flex flex-row space-x-4 mt-4">
-            <Button
-              variant="contained"
-              color="primary"
+            <button
+              className="bg-[#6788ff] hover:bg-blue-700 w-full text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
               onClick={handleEditUserOpen}
             >
               Edit
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
+            </button>
+            <button
+              className="bg-red-500 hover:bg-red-700 w-full text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
               onClick={handleDeleteUserOpen}
             >
               Delete
-            </Button>
+            </button>
           </div>
-        </Card>
+                  </Card>
         <Card
           className="w-2/5 overflow-scroll flex flex-col justify-center items-center p-4"
           sx={{
@@ -240,7 +306,7 @@ const Profile = () => {
                     </div>
                   </div>
                   <div className="ml-14 text-white">
-                  <h2 className="font-bold text-2xl mb-1">{post.title}</h2>
+                    <h2 className="font-bold text-2xl mb-1">{post.title}</h2>
                     <p className="mb-4">{post.content}</p>
 
                     {post.updated_at && (
@@ -249,22 +315,51 @@ const Profile = () => {
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-row space-x-4 mt-4">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleEditPostOpen(post)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleDeletePostOpen(post)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
+                  {editingPost === post.id ? (
+                    <div className="flex flex-col space-y-2">
+                      <TextField
+                        className="w-2/3 mt-4 ml-12"
+                        label="Title"
+                        name="title"
+                        value={editedPostData.title}
+                        onChange={handleEditInputChange}
+                      />
+                      <TextField
+                        className="w-2/3 ml-12"
+                        label="Content"
+                        name="content"
+                        value={editedPostData.content}
+                        onChange={handleEditInputChange}
+                      />
+                      <button
+                        className="bg-[#6788ff] hover:bg-blue-700 w-1/5 mb-4 ml-auto mr-28 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+                        onClick={handleEditSubmit}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col">
+                      {user && user.id === post.user_id && (
+                        <div>
+                          <button
+                            className="bg-red-500 hover:bg-red-700 w-1/4 ml-2 mr-12 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-5 float-right"
+                            style={{ overflow: "hidden", whiteSpace: "nowrap" }}
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            Delete Post
+                          </button>
+                          <button
+                            className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-5 float-right"
+                            style={{ overflow: "hidden", whiteSpace: "nowrap" }}
+                            onClick={() => handleEditPost(post.id)}
+                          >
+                            Update Post
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </Card>
               ))}
             </ul>
@@ -300,8 +395,18 @@ const Profile = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditUserClose}>Cancel</Button>
-          <Button onClick={handleEditUserSubmit}>Save</Button>
+          <button
+            className="bg-red-500 hover:bg-red-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleEditUserClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleEditUserSubmit}
+          >
+            Save
+          </button>
         </DialogActions>
       </Dialog>
       {/* Delete user dialog */}
@@ -314,8 +419,18 @@ const Profile = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteUserClose}>Cancel</Button>
-          <Button onClick={handleDeleteUserSubmit}>Delete</Button>
+          <button
+            className="bg-red-500 hover:bg-red-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleDeleteUserClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleDeleteUserSubmit}
+          >
+            Delete
+          </button>
         </DialogActions>
       </Dialog>
       {/* Edit post dialog */}
@@ -329,6 +444,7 @@ const Profile = () => {
             autoFocus
             margin="dense"
             label="Title"
+            name="title"
             type="text"
             fullWidth
             variant="standard"
@@ -338,6 +454,7 @@ const Profile = () => {
           <TextField
             margin="dense"
             label="Content"
+            name="content"
             type="text"
             fullWidth
             variant="standard"
@@ -346,8 +463,18 @@ const Profile = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditPostClose}>Cancel</Button>
-          <Button onClick={handleEditPostSubmit}>Save</Button>
+          <button
+            className="bg-red-500 hover:bg-red-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleEditPostClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleEditPostSubmit}
+          >
+            Save
+          </button>
         </DialogActions>
       </Dialog>
       {/* Delete post dialog */}
@@ -360,8 +487,18 @@ const Profile = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeletePostClose}>Cancel</Button>
-          <Button onClick={handleDeletePostSubmit}>Delete</Button>
+          <button
+            className="bg-red-500 hover:bg-red-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleDeletePostClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7"
+            onClick={handleDeletePostSubmit}
+          >
+            Delete
+          </button>
         </DialogActions>
       </Dialog>
     </div>
