@@ -41,14 +41,6 @@ CREATE TABLE IF NOT EXISTS Class (
     schedule_time VARCHAR(255) NOT NULL
 );
 
--- Create Enrollment table
-CREATE TABLE IF NOT EXISTS Enrollment (
-    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT NOT NULL,
-    class_id INT NOT NULL,
-    grade VARCHAR(2)
-);
-
 -- Stored Procedures for CRUD operations
 
 -- Drop and Create Admin Procedures with password
@@ -217,38 +209,6 @@ BEGIN
 END$$
 DELIMITER ;
 
--- Drop and Create Enrollment Procedures
-DELIMITER $$
-DROP PROCEDURE IF EXISTS CreateEnrollment$$
-CREATE PROCEDURE CreateEnrollment(IN _student_id INT, IN _class_id INT, IN _grade VARCHAR(2))
-BEGIN
-    INSERT INTO Enrollment (student_id, class_id, grade) VALUES (_student_id, _class_id, _grade);
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS ReadEnrollment$$
-CREATE PROCEDURE ReadEnrollment(IN _enrollment_id INT)
-BEGIN
-    SELECT * FROM Enrollment WHERE enrollment_id = _enrollment_id;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS UpdateEnrollment$$
-CREATE PROCEDURE UpdateEnrollment(IN _enrollment_id INT, IN _student_id INT, IN _class_id INT, IN _grade VARCHAR(2))
-BEGIN
-    UPDATE Enrollment SET student_id = _student_id, class_id = _class_id, grade = _grade WHERE enrollment_id = _enrollment_id;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS DeleteEnrollment$$
-CREATE PROCEDURE DeleteEnrollment(IN _enrollment_id INT)
-BEGIN
-    DELETE FROM Enrollment WHERE enrollment_id = _enrollment_id;
-END$$
-DELIMITER ;
 
 -- Views and Procedures for Views
 
@@ -260,28 +220,12 @@ FROM Course c
 JOIN Class cl ON c.course_id = cl.course_id
 JOIN Teacher t ON cl.teacher_id = t.teacher_id;
 
-DROP VIEW IF EXISTS StudentEnrollmentView;
-CREATE VIEW StudentEnrollmentView AS
-SELECT s.student_id, s.name AS student_name, c.title AS course_title, e.grade
-FROM Student s
-JOIN Enrollment e ON s.student_id = e.student_id
-JOIN Class cl ON e.class_id = cl.class_id
-JOIN Course c ON cl.course_id = c.course_id;
-
 -- Drop and Create Procedures for Views
 DELIMITER $$
 DROP PROCEDURE IF EXISTS ReadCourseDetail$$
 CREATE PROCEDURE ReadCourseDetail()
 BEGIN
     SELECT * FROM CourseDetailView;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS ReadStudentEnrollment$$
-CREATE PROCEDURE ReadStudentEnrollment()
-BEGIN
-    SELECT * FROM StudentEnrollmentView;
 END$$
 DELIMITER ;
 
@@ -297,17 +241,6 @@ BEGIN
     DELETE FROM Class WHERE course_id = OLD.course_id;
 END$$
 DELIMITER ;
-
-DELIMITER $$
-DROP TRIGGER IF EXISTS AfterClassDelete$$
-CREATE TRIGGER AfterClassDelete
-AFTER DELETE ON Class
-FOR EACH ROW
-BEGIN
-    DELETE FROM Enrollment WHERE class_id = OLD.class_id;
-END$$
-DELIMITER ;
-
 
 -- Drop and Create GetAll Procedures
 DELIMITER $$
@@ -351,25 +284,9 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS GetAllEnrollments$$
-CREATE PROCEDURE GetAllEnrollments()
-BEGIN
-    SELECT * FROM Enrollment;
-END$$
-DELIMITER ;
-
-DELIMITER $$
 DROP PROCEDURE IF EXISTS GetAllCourseDetails$$
 CREATE PROCEDURE GetAllCourseDetails()
 BEGIN
     SELECT * FROM CourseDetailView;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS GetAllStudentEnrollments$$
-CREATE PROCEDURE GetAllStudentEnrollments()
-BEGIN
-    SELECT * FROM StudentEnrollmentView;
 END$$
 DELIMITER ;

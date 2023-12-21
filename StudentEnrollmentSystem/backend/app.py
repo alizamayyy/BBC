@@ -134,31 +134,6 @@ class Class:
         execute_procedure(proc_name, [id])
         return '', 204
 
-# Enrollment class
-class Enrollment:
-    def __init__(self, student_id, class_id, grade):
-        self.student_id = student_id
-        self.class_id = class_id
-        self.grade = grade
-
-    def create(self, proc_name, args):
-        data = request.json
-        execute_procedure(proc_name, args)
-        return jsonify(data), 201
-
-    def read(self, proc_name, id):
-        results = execute_procedure(proc_name, [id])
-        return jsonify(results), 200
-
-    def update(self, proc_name, id, args):
-        data = request.json
-        execute_procedure(proc_name, [id] + args)
-        return jsonify(data), 200
-
-    def delete(self, proc_name, id):
-        execute_procedure(proc_name, [id])
-        return '', 204
-
 # Admin Routes
 @app.route('/admin', methods=['POST'])
 def create_admin():
@@ -249,33 +224,10 @@ def class_operations(id):
         class_ = Class(None, None, None)
         return class_.delete('DeleteClass', id)
 
-# Enrollment Routes
-@app.route('/enrollment', methods=['POST'])
-def create_enrollment():
-    enrollment = Enrollment(request.json['student_id'], request.json['class_id'], request.json['grade'])
-    return enrollment.create('CreateEnrollment', [enrollment.student_id, enrollment.class_id, enrollment.grade])
-
-@app.route('/enrollment/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-def enrollment_operations(id):
-    if request.method == 'GET':
-        enrollment = Enrollment(None, None, None)
-        return enrollment.read('ReadEnrollment', id)
-    elif request.method == 'PUT':
-        enrollment = Enrollment(request.json['student_id'], request.json['class_id'], request.json['grade'])
-        return enrollment.update('UpdateEnrollment', id, [enrollment.student_id, enrollment.class_id, enrollment.grade])
-    elif request.method == 'DELETE':
-        enrollment = Enrollment(None, None, None)
-        return enrollment.delete('DeleteEnrollment', id)
-
 # View Routes
 @app.route('/course-detail-view', methods=['GET'])
 def course_detail_view():
     results = execute_procedure('ReadCourseDetail', [])
-    return jsonify(results), 200
-
-@app.route('/student-enrollment-view', methods=['GET'])
-def student_enrollment_view():
-    results = execute_procedure('ReadStudentEnrollment', [])
     return jsonify(results), 200
 
 # Routes for GetAll Procedures
@@ -304,19 +256,9 @@ def get_all_classes():
     results = execute_procedure('GetAllClasses', [])
     return jsonify(results), 200
 
-@app.route('/enrollment/all', methods=['GET'])
-def get_all_enrollments():
-    results = execute_procedure('GetAllEnrollments', [])
-    return jsonify(results), 200
-
 @app.route('/course-detail-view/all', methods=['GET'])
 def get_all_course_details():
     results = execute_procedure('GetAllCourseDetails', [])
-    return jsonify(results), 200
-
-@app.route('/student-enrollment-view/all', methods=['GET'])
-def get_all_student_enrollments():
-    results = execute_procedure('GetAllStudentEnrollments', [])
     return jsonify(results), 200
 
 # Main execution
