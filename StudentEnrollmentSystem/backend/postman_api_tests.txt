@@ -169,3 +169,47 @@ http://localhost:5000/course-detail-view
 GET
 http://localhost:5000/student-enrollment-view
 {}
+
+
+# More More
+
+
+# Test case for getting all admins
+GET
+http://localhost:5000/admin/all
+{}
+
+# Test case for getting all students
+GET
+http://localhost:5000/student/all
+{}
+
+# Test case for getting all teachers
+GET
+http://localhost:5000/teacher/all
+{}
+
+# Test case for getting all courses
+GET
+http://localhost:5000/course/all
+{}
+
+# Test case for getting all classes
+GET
+http://localhost:5000/class/all
+{}
+
+# Test case for getting all enrollments
+GET
+http://localhost:5000/enrollment/all
+{}
+
+# Test case for getting all course details
+GET
+http://localhost:5000/course-detail-view/all
+{}
+
+# Test case for getting all student enrollments
+GET
+http://localhost:5000/student-enrollment-view/all
+{}

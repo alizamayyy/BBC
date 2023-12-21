@@ -167,6 +167,47 @@ def student_enrollment_view():
     results = execute_procedure('ReadStudentEnrollment', [])
     return jsonify(results), 200
 
+# Routes for GetAll Procedures
+@app.route('/admin/all', methods=['GET'])
+def get_all_admins():
+    results = execute_procedure('GetAllAdmins', [])
+    return jsonify(results), 200
+
+@app.route('/student/all', methods=['GET'])
+def get_all_students():
+    results = execute_procedure('GetAllStudents', [])
+    return jsonify(results), 200
+
+@app.route('/teacher/all', methods=['GET'])
+def get_all_teachers():
+    results = execute_procedure('GetAllTeachers', [])
+    return jsonify(results), 200
+
+@app.route('/course/all', methods=['GET'])
+def get_all_courses():
+    results = execute_procedure('GetAllCourses', [])
+    return jsonify(results), 200
+
+@app.route('/class/all', methods=['GET'])
+def get_all_classes():
+    results = execute_procedure('GetAllClasses', [])
+    return jsonify(results), 200
+
+@app.route('/enrollment/all', methods=['GET'])
+def get_all_enrollments():
+    results = execute_procedure('GetAllEnrollments', [])
+    return jsonify(results), 200
+
+@app.route('/course-detail-view/all', methods=['GET'])
+def get_all_course_details():
+    results = execute_procedure('GetAllCourseDetails', [])
+    return jsonify(results), 200
+
+@app.route('/student-enrollment-view/all', methods=['GET'])
+def get_all_student_enrollments():
+    results = execute_procedure('GetAllStudentEnrollments', [])
+    return jsonify(results), 200
+
 # Main execution
 if __name__ == '__main__':
     app.run(debug=True)

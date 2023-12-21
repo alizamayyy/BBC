@@ -311,3 +311,69 @@ BEGIN
     DELETE FROM Enrollment WHERE class_id = OLD.class_id;
 END$$
 DELIMITER ;
+
+
+-- Drop and Create GetAll Procedures
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllAdmins$$
+CREATE PROCEDURE GetAllAdmins()
+BEGIN
+    SELECT * FROM Admin;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllStudents$$
+CREATE PROCEDURE GetAllStudents()
+BEGIN
+    SELECT * FROM Student;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllTeachers$$
+CREATE PROCEDURE GetAllTeachers()
+BEGIN
+    SELECT * FROM Teacher;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllCourses$$
+CREATE PROCEDURE GetAllCourses()
+BEGIN
+    SELECT * FROM Course;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllClasses$$
+CREATE PROCEDURE GetAllClasses()
+BEGIN
+    SELECT * FROM Class;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllEnrollments$$
+CREATE PROCEDURE GetAllEnrollments()
+BEGIN
+    SELECT * FROM Enrollment;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllCourseDetails$$
+CREATE PROCEDURE GetAllCourseDetails()
+BEGIN
+    SELECT * FROM CourseDetailView;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllStudentEnrollments$$
+CREATE PROCEDURE GetAllStudentEnrollments()
+BEGIN
+    SELECT * FROM StudentEnrollmentView;
+END$$
+DELIMITER ;
