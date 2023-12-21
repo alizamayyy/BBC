@@ -40,7 +40,7 @@ def execute_procedure(proc_name, args):
 @app.route('/admin', methods=['POST'])
 def create_admin():
     data = request.json
-    execute_procedure('CreateAdmin', [data['name'], data['email']])
+    execute_procedure('CreateAdmin', [data['name'], data['email'], data['password']])
     return jsonify(data), 201
 
 @app.route('/admin/<int:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -50,7 +50,7 @@ def admin_operations(id):
         return jsonify(results), 200
     elif request.method == 'PUT':
         data = request.json
-        execute_procedure('UpdateAdmin', [id, data['name'], data['email']])
+        execute_procedure('UpdateAdmin', [id, data['name'], data['email'], data['password']])
         return jsonify(data), 200
     elif request.method == 'DELETE':
         execute_procedure('DeleteAdmin', [id])

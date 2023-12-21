@@ -4,13 +4,13 @@
 CREATE DATABASE IF NOT EXISTS student_enrollment_db;
 USE student_enrollment_db;
 
--- Create Admin table
+-- Modify Admin table to include password column
 CREATE TABLE IF NOT EXISTS Admin (
     admin_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL  -- New column for password
 );
-
 -- Create Student table
 CREATE TABLE IF NOT EXISTS Student (
     student_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,12 +55,12 @@ CREATE TABLE IF NOT EXISTS Enrollment (
 
 -- Stored Procedures for CRUD operations
 
--- Drop and Create Admin Procedures
+-- Drop and Create Admin Procedures with password
 DELIMITER $$
 DROP PROCEDURE IF EXISTS CreateAdmin$$
-CREATE PROCEDURE CreateAdmin(IN _name VARCHAR(255), IN _email VARCHAR(255))
+CREATE PROCEDURE CreateAdmin(IN _name VARCHAR(255), IN _email VARCHAR(255), IN _password VARCHAR(255))
 BEGIN
-    INSERT INTO Admin (name, email) VALUES (_name, _email);
+    INSERT INTO Admin (name, email, password) VALUES (_name, _email, _password);
 END$$
 DELIMITER ;
 
@@ -74,9 +74,9 @@ DELIMITER ;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS UpdateAdmin$$
-CREATE PROCEDURE UpdateAdmin(IN _admin_id INT, IN _name VARCHAR(255), IN _email VARCHAR(255))
+CREATE PROCEDURE UpdateAdmin(IN _admin_id INT, IN _name VARCHAR(255), IN _email VARCHAR(255), IN _password VARCHAR(255))
 BEGIN
-    UPDATE Admin SET name = _name, email = _email WHERE admin_id = _admin_id;
+    UPDATE Admin SET name = _name, email = _email, password = _password WHERE admin_id = _admin_id;
 END$$
 DELIMITER ;
 
@@ -87,6 +87,7 @@ BEGIN
     DELETE FROM Admin WHERE admin_id = _admin_id;
 END$$
 DELIMITER ;
+
 
 -- Drop and Create Student Procedures
 DELIMITER $$
