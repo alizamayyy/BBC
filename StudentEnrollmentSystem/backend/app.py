@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Database Configuration
 db_config = {
     'user': 'root',
-    'password': 'password',
+    'password': 'root',
     'host': 'localhost',
     'database': 'student_enrollment_db',
     'raise_on_warnings': True
