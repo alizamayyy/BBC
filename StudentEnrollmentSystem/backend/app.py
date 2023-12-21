@@ -57,6 +57,9 @@ class Person:
 
     def read(self, proc_name, id):
         results = execute_procedure(proc_name, [id])
+        # Add labels to the results
+        labels = ["id", "name", "email"]
+        results = [dict(zip(labels, result)) for result in results]
         return jsonify(results), 200
 
     def update(self, proc_name, id, args):
@@ -98,6 +101,9 @@ class Course:
 
     def read(self, proc_name, id):
         results = execute_procedure(proc_name, [id])
+        # Add labels to the results
+        labels = ["id", "title", "description"]
+        results = [dict(zip(labels, result)) for result in results]
         return jsonify(results), 200
 
     def update(self, proc_name, id, args):
@@ -123,6 +129,9 @@ class Class:
 
     def read(self, proc_name, id):
         results = execute_procedure(proc_name, [id])
+        # Add labels to the results
+        labels = ["id", "course_id", "teacher_id", "schedule_time"]
+        results = [dict(zip(labels, result)) for result in results]
         return jsonify(results), 200
 
     def update(self, proc_name, id, args):
@@ -228,37 +237,58 @@ def class_operations(id):
 @app.route('/course-detail-view', methods=['GET'])
 def course_detail_view():
     results = execute_procedure('ReadCourseDetail', [])
+    # Add labels to the results
+    labels = ["course_id", "course_title", "course_description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 # Routes for GetAll Procedures
 @app.route('/admin/all', methods=['GET'])
 def get_all_admins():
     results = execute_procedure('GetAllAdmins', [])
+    # Add labels to the results
+    labels = ["id", "name", "email", "password"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 @app.route('/student/all', methods=['GET'])
 def get_all_students():
     results = execute_procedure('GetAllStudents', [])
+    # Add labels to the results
+    labels = ["id", "name", "email", "date_of_birth"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 @app.route('/teacher/all', methods=['GET'])
 def get_all_teachers():
     results = execute_procedure('GetAllTeachers', [])
+    # Add labels to the results
+    labels = ["id", "name", "email"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 @app.route('/course/all', methods=['GET'])
 def get_all_courses():
     results = execute_procedure('GetAllCourses', [])
+    # Add labels to the results
+    labels = ["id", "title", "description"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 @app.route('/class/all', methods=['GET'])
 def get_all_classes():
     results = execute_procedure('GetAllClasses', [])
+    # Add labels to the results
+    labels = ["id", "course_id", "teacher_id", "schedule_time"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 @app.route('/course-detail-view/all', methods=['GET'])
 def get_all_course_details():
     results = execute_procedure('GetAllCourseDetails', [])
+    # Add labels to the results
+    labels = ["course_id", "course_title", "course_description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
 # Main execution
