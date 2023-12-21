@@ -44,125 +44,228 @@ def execute_procedure(proc_name, args):
 
     return results
 
+# Base class for Admin, Student, and Teacher
+class Person:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def create(self, proc_name, args):
+        data = request.json
+        execute_procedure(proc_name, args)
+        return jsonify(data), 201
+
+    def read(self, proc_name, id):
+        results = execute_procedure(proc_name, [id])
+        return jsonify(results), 200
+
+    def update(self, proc_name, id, args):
+        data = request.json
+        execute_procedure(proc_name, [id] + args)
+        return jsonify(data), 200
+
+    def delete(self, proc_name, id):
+        execute_procedure(proc_name, [id])
+        return '', 204
+
+# Admin class inherits from Person
+class Admin(Person):
+    def __init__(self, name, email, password):
+        super().__init__(name, email)
+        self.password = password
+
+# Student class inherits from Person
+class Student(Person):
+    def __init__(self, name, email, date_of_birth):
+        super().__init__(name, email)
+        self.date_of_birth = date_of_birth
+
+# Teacher class inherits from Person
+class Teacher(Person):
+    def __init__(self, name, email):
+        super().__init__(name, email)
+
+# Course class
+class Course:
+    def __init__(self, title, description):
+        self.title = title
+        self.description = description
+
+    def create(self, proc_name, args):
+        data = request.json
+        execute_procedure(proc_name, args)
+        return jsonify(data), 201
+
+    def read(self, proc_name, id):
+        results = execute_procedure(proc_name, [id])
+        return jsonify(results), 200
+
+    def update(self, proc_name, id, args):
+        data = request.json
+        execute_procedure(proc_name, [id] + args)
+        return jsonify(data), 200
+
+    def delete(self, proc_name, id):
+        execute_procedure(proc_name, [id])
+        return '', 204
+
+# Class class
+class Class:
+    def __init__(self, course_id, teacher_id, schedule_time):
+        self.course_id = course_id
+        self.teacher_id = teacher_id
+        self.schedule_time = schedule_time
+
+    def create(self, proc_name, args):
+        data = request.json
+        execute_procedure(proc_name, args)
+        return jsonify(data), 201
+
+    def read(self, proc_name, id):
+        results = execute_procedure(proc_name, [id])
+        return jsonify(results), 200
+
+    def update(self, proc_name, id, args):
+        data = request.json
+        execute_procedure(proc_name, [id] + args)
+        return jsonify(data), 200
+
+    def delete(self, proc_name, id):
+        execute_procedure(proc_name, [id])
+        return '', 204
+
+# Enrollment class
+class Enrollment:
+    def __init__(self, student_id, class_id, grade):
+        self.student_id = student_id
+        self.class_id = class_id
+        self.grade = grade
+
+    def create(self, proc_name, args):
+        data = request.json
+        execute_procedure(proc_name, args)
+        return jsonify(data), 201
+
+    def read(self, proc_name, id):
+        results = execute_procedure(proc_name, [id])
+        return jsonify(results), 200
+
+    def update(self, proc_name, id, args):
+        data = request.json
+        execute_procedure(proc_name, [id] + args)
+        return jsonify(data), 200
+
+    def delete(self, proc_name, id):
+        execute_procedure(proc_name, [id])
+        return '', 204
+
 # Admin Routes
 @app.route('/admin', methods=['POST'])
 def create_admin():
-    data = request.json
-    execute_procedure('CreateAdmin', [data['name'], data['email'], data['password']])
-    return jsonify(data), 201
+    admin = Admin(request.json['name'], request.json['email'], request.json['password'])
+    return admin.create('CreateAdmin', [admin.name, admin.email, admin.password])
 
 @app.route('/admin/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def admin_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadAdmin', [id])
-        return jsonify(results), 200
+        admin = Admin(None, None, None)
+        return admin.read('ReadAdmin', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateAdmin', [id, data['name'], data['email'], data['password']])
-        return jsonify(data), 200
+        admin = Admin(request.json['name'], request.json['email'], request.json['password'])
+        return admin.update('UpdateAdmin', id, [admin.name, admin.email, admin.password])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteAdmin', [id])
-        return '', 204
+        admin = Admin(None, None, None)
+        return admin.delete('DeleteAdmin', id)
 
 # Student Routes
 @app.route('/student', methods=['POST'])
 def create_student():
-    data = request.json
-    execute_procedure('CreateStudent', [data['name'], data['email'], data['date_of_birth']])
-    return jsonify(data), 201
+    student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'])
+    return student.create('CreateStudent', [student.name, student.email, student.date_of_birth])
 
 @app.route('/student/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def student_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadStudent', [id])
-        return jsonify(results), 200
+        student = Student(None, None, None)
+        return student.read('ReadStudent', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateStudent', [id, data['name'], data['email'], data['date_of_birth']])
-        return jsonify(data), 200
+        student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'])
+        return student.update('UpdateStudent', id, [student.name, student.email, student.date_of_birth])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteStudent', [id])
-        return '', 204
+        student = Student(None, None, None)
+        return student.delete('DeleteStudent', id)
 
 # Teacher Routes
 @app.route('/teacher', methods=['POST'])
 def create_teacher():
-    data = request.json
-    execute_procedure('CreateTeacher', [data['name'], data['email']])
-    return jsonify(data), 201
+    teacher = Teacher(request.json['name'], request.json['email'])
+    return teacher.create('CreateTeacher', [teacher.name, teacher.email])
 
 @app.route('/teacher/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def teacher_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadTeacher', [id])
-        return jsonify(results), 200
+        teacher = Teacher(None, None)
+        return teacher.read('ReadTeacher', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateTeacher', [id, data['name'], data['email']])
-        return jsonify(data), 200
+        teacher = Teacher(request.json['name'], request.json['email'])
+        return teacher.update('UpdateTeacher', id, [teacher.name, teacher.email])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteTeacher', [id])
-        return '', 204
+        teacher = Teacher(None, None)
+        return teacher.delete('DeleteTeacher', id)
 
 # Course Routes
 @app.route('/course', methods=['POST'])
 def create_course():
-    data = request.json
-    execute_procedure('CreateCourse', [data['title'], data['description']])
-    return jsonify(data), 201
+    course = Course(request.json['title'], request.json['description'])
+    return course.create('CreateCourse', [course.title, course.description])
 
 @app.route('/course/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def course_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadCourse', [id])
-        return jsonify(results), 200
+        course = Course(None, None)
+        return course.read('ReadCourse', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateCourse', [id, data['title'], data['description']])
-        return jsonify(data), 200
+        course = Course(request.json['title'], request.json['description'])
+        return course.update('UpdateCourse', id, [course.title, course.description])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteCourse', [id])
-        return '', 204
+        course = Course(None, None)
+        return course.delete('DeleteCourse', id)
 
 # Class Routes
 @app.route('/class', methods=['POST'])
 def create_class():
-    data = request.json
-    execute_procedure('CreateClass', [data['course_id'], data['teacher_id'], data['schedule_time']])
-    return jsonify(data), 201
+    class_ = Class(request.json['course_id'], request.json['teacher_id'], request.json['schedule_time'])
+    return class_.create('CreateClass', [class_.course_id, class_.teacher_id, class_.schedule_time])
 
 @app.route('/class/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def class_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadClass', [id])
-        return jsonify(results), 200
+        class_ = Class(None, None, None)
+        return class_.read('ReadClass', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateClass', [id, data['course_id'], data['teacher_id'], data['schedule_time']])
-        return jsonify(data), 200
+        class_ = Class(request.json['course_id'], request.json['teacher_id'], request.json['schedule_time'])
+        return class_.update('UpdateClass', id, [class_.course_id, class_.teacher_id, class_.schedule_time])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteClass', [id])
-        return '', 204
+        class_ = Class(None, None, None)
+        return class_.delete('DeleteClass', id)
 
 # Enrollment Routes
 @app.route('/enrollment', methods=['POST'])
 def create_enrollment():
-    data = request.json
-    execute_procedure('CreateEnrollment', [data['student_id'], data['class_id'], data['grade']])
-    return jsonify(data), 201
+    enrollment = Enrollment(request.json['student_id'], request.json['class_id'], request.json['grade'])
+    return enrollment.create('CreateEnrollment', [enrollment.student_id, enrollment.class_id, enrollment.grade])
 
 @app.route('/enrollment/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def enrollment_operations(id):
     if request.method == 'GET':
-        results = execute_procedure('ReadEnrollment', [id])
-        return jsonify(results), 200
+        enrollment = Enrollment(None, None, None)
+        return enrollment.read('ReadEnrollment', id)
     elif request.method == 'PUT':
-        data = request.json
-        execute_procedure('UpdateEnrollment', [id, data['student_id'], data['class_id'], data['grade']])
-        return jsonify(data), 200
+        enrollment = Enrollment(request.json['student_id'], request.json['class_id'], request.json['grade'])
+        return enrollment.update('UpdateEnrollment', id, [enrollment.student_id, enrollment.class_id, enrollment.grade])
     elif request.method == 'DELETE':
-        execute_procedure('DeleteEnrollment', [id])
-        return '', 204
+        enrollment = Enrollment(None, None, None)
+        return enrollment.delete('DeleteEnrollment', id)
 
 # View Routes
 @app.route('/course-detail-view', methods=['GET'])

@@ -38,9 +38,7 @@ CREATE TABLE IF NOT EXISTS Class (
     class_id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT NOT NULL,
     teacher_id INT NOT NULL,
-    schedule_time VARCHAR(255) NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES Course(course_id),
-    FOREIGN KEY (teacher_id) REFERENCES Teacher(teacher_id)
+    schedule_time VARCHAR(255) NOT NULL
 );
 
 -- Create Enrollment table
@@ -48,9 +46,7 @@ CREATE TABLE IF NOT EXISTS Enrollment (
     enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     class_id INT NOT NULL,
-    grade VARCHAR(2),
-    FOREIGN KEY (student_id) REFERENCES Student(student_id),
-    FOREIGN KEY (class_id) REFERENCES Class(class_id)
+    grade VARCHAR(2)
 );
 
 -- Stored Procedures for CRUD operations
