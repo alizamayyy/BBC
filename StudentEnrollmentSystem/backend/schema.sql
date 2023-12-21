@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Class (
     class_id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT NOT NULL,
     teacher_id INT NOT NULL,
-    schedule_time TIME NOT NULL,
+    schedule_time VARCHAR(255) NOT NULL,
     FOREIGN KEY (course_id) REFERENCES Course(course_id),
     FOREIGN KEY (teacher_id) REFERENCES Teacher(teacher_id)
 );
@@ -191,7 +191,7 @@ DELIMITER ;
 -- Drop and Create Class Procedures
 DELIMITER $$
 DROP PROCEDURE IF EXISTS CreateClass$$
-CREATE PROCEDURE CreateClass(IN _course_id INT, IN _teacher_id INT, IN _schedule_time TIME)
+CREATE PROCEDURE CreateClass(IN _course_id INT, IN _teacher_id INT, IN _schedule_time VARCHAR(255))
 BEGIN
     INSERT INTO Class (course_id, teacher_id, schedule_time) VALUES (_course_id, _teacher_id, _schedule_time);
 END$$
@@ -207,7 +207,7 @@ DELIMITER ;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS UpdateClass$$
-CREATE PROCEDURE UpdateClass(IN _class_id INT, IN _course_id INT, IN _teacher_id INT, IN _schedule_time TIME)
+CREATE PROCEDURE UpdateClass(IN _class_id INT, IN _course_id INT, IN _teacher_id INT, IN _schedule_time VARCHAR(255))
 BEGIN
     UPDATE Class SET course_id = _course_id, teacher_id = _teacher_id, schedule_time = _schedule_time WHERE class_id = _class_id;
 END$$

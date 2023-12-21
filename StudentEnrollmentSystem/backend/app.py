@@ -1,5 +1,3 @@
-# Filename: app.py
-
 from flask import Flask, request, jsonify
 import mysql.connector
 
@@ -20,20 +18,30 @@ def db_connection():
     try:
         conn = mysql.connector.connect(**db_config)
     except mysql.connector.Error as e:
-        print(e)
+        print("Database connection failed:", e)
+        return None
     return conn
 
 # Helper function to execute stored procedures
 def execute_procedure(proc_name, args):
     conn = db_connection()
-    cursor = conn.cursor()
-    cursor.callproc(proc_name, args)
-    results = []
-    for result in cursor.stored_results():
-        results.extend(result.fetchall())
-    conn.commit()
-    cursor.close()
-    conn.close()
+    if conn is None:
+        return []
+
+    try:
+        cursor = conn.cursor()
+        cursor.callproc(proc_name, args)
+        results = []
+        for result in cursor.stored_results():
+            results.extend(result.fetchall())
+        conn.commit()
+    except mysql.connector.Error as e:
+        print("Error executing procedure:", e)
+        results = []
+    finally:
+        cursor.close()
+        conn.close()
+
     return results
 
 # Helper function to convert tuples to dictionaries
