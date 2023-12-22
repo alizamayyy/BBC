@@ -76,6 +76,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfAdmins$$
+CREATE PROCEDURE GetNumberOfAdmins()
+BEGIN
+    SELECT COUNT(*) FROM Admin;
+END$$
+DELIMITER ;
+
+
 
 -- Drop and Create Student Procedures
 DELIMITER $$
@@ -110,6 +119,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfStudents$$
+CREATE PROCEDURE GetNumberOfStudents()
+BEGIN
+    SELECT COUNT(*) FROM Student;
+END$$
+DELIMITER ;
+
+
 -- Drop and Create Teacher Procedures
 DELIMITER $$
 DROP PROCEDURE IF EXISTS CreateTeacher$$
@@ -142,6 +160,15 @@ BEGIN
     DELETE FROM Teacher WHERE teacher_id = _teacher_id;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfTeachers$$
+CREATE PROCEDURE GetNumberOfTeachers()
+BEGIN
+    SELECT COUNT(*) FROM Teacher;
+END$$
+DELIMITER ;
+
 
 -- Drop and Create Course Procedures
 DELIMITER $$
@@ -176,6 +203,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfCourses$$
+CREATE PROCEDURE GetNumberOfCoursesPerClass(IN _class_id INT)
+BEGIN
+    SELECT COUNT(*) FROM Course WHERE course_id IN (SELECT course_id FROM Class WHERE class_id = _class_id);
+END$$
+DELIMITER ;
+
+
 -- Drop and Create Class Procedures
 DELIMITER $$
 DROP PROCEDURE IF EXISTS CreateClass$$
@@ -209,6 +245,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfClasses$$
+CREATE PROCEDURE GetNumberOfClasses()
+BEGIN
+    SELECT COUNT(*) FROM Class;
+END$$
+DELIMITER ;
+
+
 
 -- Views and Procedures for Views
 
@@ -228,6 +273,28 @@ BEGIN
     SELECT * FROM CourseDetailView;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS ReadClassDetail$$
+CREATE PROCEDURE ReadClassDetail(IN _class_id INT)
+BEGIN
+    SELECT cl.class_id, co.title, co.description, t.name as teacher_name, t.email as teacher_email
+    FROM Class cl
+    JOIN Course co ON cl.course_id = co.course_id
+    JOIN Teacher t ON cl.teacher_id = t.teacher_id
+    WHERE cl.class_id = _class_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS ReadStudentDetail$$
+CREATE PROCEDURE ReadStudentDetail(IN _student_id INT)
+BEGIN
+    SELECT * FROM Student WHERE student_id = _student_id;
+END$$
+DELIMITER ;
+
+
 
 -- Triggers for Cascade Effects
 
