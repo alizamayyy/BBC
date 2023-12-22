@@ -161,6 +161,11 @@ def admin_operations(id):
         admin = Admin(None, None, None)
         return admin.delete('DeleteAdmin', id)
 
+@app.route('/admin/count', methods=['GET'])
+def get_number_of_admins():
+    results = execute_procedure('GetNumberOfAdmins', [])
+    return jsonify({'count': results[0][0]}), 200
+
 # Student Routes
 @app.route('/student', methods=['POST'])
 def create_student():
@@ -178,6 +183,11 @@ def student_operations(id):
     elif request.method == 'DELETE':
         student = Student(None, None, None)
         return student.delete('DeleteStudent', id)
+
+@app.route('/student/count', methods=['GET'])
+def get_number_of_students():
+    results = execute_procedure('GetNumberOfStudents', [])
+    return jsonify({'count': results[0][0]}), 200
 
 # Teacher Routes
 @app.route('/teacher', methods=['POST'])
@@ -197,6 +207,11 @@ def teacher_operations(id):
         teacher = Teacher(None, None)
         return teacher.delete('DeleteTeacher', id)
 
+@app.route('/teacher/count', methods=['GET'])
+def get_number_of_teachers():
+    results = execute_procedure('GetNumberOfTeachers', [])
+    return jsonify({'count': results[0][0]}), 200
+
 # Course Routes
 @app.route('/course', methods=['POST'])
 def create_course():
@@ -214,6 +229,11 @@ def course_operations(id):
     elif request.method == 'DELETE':
         course = Course(None, None)
         return course.delete('DeleteCourse', id)
+
+@app.route('/class/<int:class_id>/course/count', methods=['GET'])
+def get_number_of_courses_per_class(class_id):
+    results = execute_procedure('GetNumberOfCoursesPerClass', [class_id])
+    return jsonify({'count': results[0][0]}), 200
 
 # Class Routes
 @app.route('/class', methods=['POST'])
@@ -233,12 +253,31 @@ def class_operations(id):
         class_ = Class(None, None, None)
         return class_.delete('DeleteClass', id)
 
+@app.route('/class/count', methods=['GET'])
+def get_number_of_classes():
+    results = execute_procedure('GetNumberOfClasses', [])
+    return jsonify({'count': results[0][0]}), 200
+
 # View Routes
 @app.route('/course-detail-view', methods=['GET'])
 def course_detail_view():
     results = execute_procedure('ReadCourseDetail', [])
     # Add labels to the results
     labels = ["course_id", "course_title", "course_description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    results = [dict(zip(labels, result)) for result in results]
+    return jsonify(results), 200
+
+@app.route('/class/<int:class_id>/detail', methods=['GET'])
+def class_detail_view(class_id):
+    results = execute_procedure('ReadClassDetail', [class_id])
+    labels = ["class_id", "course_title", "course_description", "teacher_name", "teacher_email"]
+    results = [dict(zip(labels, result)) for result in results]
+    return jsonify(results), 200
+
+@app.route('/student/<int:student_id>/detail', methods=['GET'])
+def student_detail_view(student_id):
+    results = execute_procedure('ReadStudentDetail', [student_id])
+    labels = ["student_id", "name", "email", "date_of_birth"]
     results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
