@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
-import mysql.connector
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+import mysql.connector
 
 # Database Configuration
 db_config = {
@@ -257,6 +259,11 @@ def course_operations(id):
         course = Course(None, None, None, None, None)
         return course.delete('DeleteCourse', id)
 
+@app.route('/course/count', methods=['GET'])
+def get_number_of_courses():
+    results = execute_procedure('GetNumberOfCourses', [])
+    return jsonify({'count': results[0][0]}), 200
+
 
 @app.route('/class/<int:class_id>/course/count', methods=['GET'])
 def get_number_of_courses_per_class(class_id):
@@ -360,4 +367,4 @@ def get_all_course_details():
 
 # Main execution
 if __name__ == '__main__':
-    app.run(debug=True)
+     app.run(debug=True)

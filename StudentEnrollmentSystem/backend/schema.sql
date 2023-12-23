@@ -233,6 +233,14 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- Drop and Create Procedure for Total Number of Courses
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetNumberOfCourses$$
+CREATE PROCEDURE GetNumberOfCourses()
+BEGIN
+    SELECT COUNT(*) FROM Course;
+END$$
+DELIMITER ;
 
 
 -- Drop and Create Class Procedures
