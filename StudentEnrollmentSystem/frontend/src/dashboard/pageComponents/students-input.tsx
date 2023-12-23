@@ -7,13 +7,12 @@ import axios from "axios";
 const StudentsInput = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [date, setDate] = useState<string | undefined>();
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const handleDateSelect = (selectedDate: Date) => {
-    const dateString = selectedDate.toLocaleDateString();
-    setDate(dateString);
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    console.log(selectedDate);
   };
-
   const createStudent = async () => {
     const apiUrl = "http://localhost:5000/student";
 
@@ -30,10 +29,10 @@ const StudentsInput = () => {
 
       if (response.status === 200 || response.status === 201) {
         console.log("Student created successfully");
-
+        console.log(response.data);
         setName("");
         setEmail("");
-        setDate("");
+        setDate(undefined);
       } else {
         console.error("Failed to create student");
       }
@@ -75,7 +74,11 @@ const StudentsInput = () => {
             onSelect={handleDateSelect}
             className="rounded-md ml-16"
           />
-          {date && <p className="text-sm mt-2">Selected Date: {date}</p>}
+          {date && (
+            <p className="text-sm mt-2">
+              Selected Date: {date.toLocaleDateString()}
+            </p>
+          )}
         </div>
         <button
           onClick={createStudent}
