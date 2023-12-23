@@ -111,9 +111,9 @@ DELIMITER ;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS UpdateStudent$$
-CREATE PROCEDURE UpdateStudent(IN _student_id INT, IN _name VARCHAR(255), IN _email VARCHAR(255), IN _date_of_birth DATE, IN _class_id INT)
+CREATE PROCEDURE UpdateStudent(IN _student_id INT, IN _name VARCHAR(255), IN _email VARCHAR(255))
 BEGIN
-    UPDATE Student SET name = _name, email = _email, date_of_birth = _date_of_birth, class_id = _class_id WHERE student_id = _student_id;
+    UPDATE Student SET name = _name, email = _email WHERE student_id = _student_id;
 END$$
 DELIMITER ;
 
