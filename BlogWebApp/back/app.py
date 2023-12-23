@@ -249,9 +249,11 @@ class Comment:
             comments = [
                 {
                     "id": comment[0],
-                    "id": comment[1],
+                    "post_id": comment[1],
                     "user_id": comment[2],
                     "content": comment[3],
+                    "created_at": comment[4],
+                    "updated_at": comment[5],
                 }
                 for comment in comments_data
             ]
