@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -44,7 +43,7 @@ import {
 } from "../../components/ui/table";
 
 export type Student = {
-    student_id: number;
+    id: number;
     name: string;
     email: string;
     date_of_birth: string;
@@ -62,6 +61,8 @@ export function StudentsTable() {
         const fetchData = async () => {
             try {
                 const response = await axios.get("http://localhost:5000/student/all");
+                const sampleStudent = response.data[0];
+                console.log("Sample Student:", sampleStudent);
                 setStudents(response.data);
             } catch (error) {
                 console.error("Error fetching students:", error);
@@ -75,9 +76,34 @@ export function StudentsTable() {
 
     const formatDateString = (dateString: string) => {
         const date = new Date(dateString);
-        const options = { day: "2-digit", month: "short", year: "numeric" };
+        const options: Intl.DateTimeFormatOptions = {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        };
         const formattedDate = date.toLocaleDateString("en-US", options);
         return formattedDate;
+    };
+
+    const handleDeleteStudent = async (id: number) => {
+        try {
+            // Send a DELETE request to delete the student
+            const response = await axios.delete(`http://localhost:5000/student/${id}`);
+
+            // Handle success, e.g., show a success message or update state
+            console.log("Student deleted successfully:", response.data);
+
+            // Update the students state by removing the deleted student
+            const updatedStudents = students.filter((student) => student.id !== id);
+            setStudents(updatedStudents);
+
+            // Close the dialog
+            setDialogOpen(false);
+        } catch (error) {
+            console.error("Error deleting student:", error);
+
+            // Handle error, e.g., show an error message
+        }
     };
 
     const columns: ColumnDef<Student>[] = [
@@ -188,7 +214,13 @@ export function StudentsTable() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button variant="destructive" onClick={() => console.log("Delete")}>
+                    <Button
+                        variant="destructive"
+                        onClick={() => {
+                            console.log("Deleting student with ID:", row.original.id);
+                            handleDeleteStudent(row.original.id);
+                        }}
+                    >
                         Delete
                     </Button>
                 </div>
@@ -199,6 +231,9 @@ export function StudentsTable() {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+    const [editedName, setEditedName] = useState("");
+    const [editedEmail, setEditedEmail] = useState("");
+    const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 
     const table = useReactTable({
         data: students,
@@ -218,36 +253,59 @@ export function StudentsTable() {
             rowSelection,
         },
     });
-    const handleEditProfileSubmit = async (id: number, name: string, email: string) => {
-        try {
-            // Prepare the request body
-            const requestBody = {
-                name,
-                email,
-            };
-            console.log("Submitting changes...", id, name, email);
 
-            // Send a PUT request to update the student profile
-            const response = await axios.put(`http://localhost:5000/student/${id}`, requestBody);
+    // const handleEditProfileSubmit = async () => {
+    //     console.log("Save changes button clicked"); // Add this line
+    //     if (selectedRowId !== null) {
+    //         try {
+    //             // Prepare the request body
+    //             const requestBody = {
+    //                 name: editedName,
+    //                 email: editedEmail,
+    //             };
 
-            // Handle success, e.g., show a success message or update state
-            console.log("Student profile edited successfully:", response.data);
+    //             console.log("Submitting request to update student profile:", requestBody);
 
-            // Update the students state with the modified data
-            const updatedStudents = students.map((student) =>
-                student.student_id === id ? { ...student, name, email } : student
-            );
+    //             // Send a PUT request to update the student profile
+    //             const response = await axios.put(
+    //                 `http://localhost:5000/student/${selectedRowId}`,
+    //                 requestBody
+    //             );
 
-            setStudents(updatedStudents);
+    //             // Handle success, e.g., show a success message or update state
+    //             console.log("Response from server:", response.data);
+    //             console.log("Student profile edited successfully.");
 
-            // Close the dialog
-            setDialogOpen(false);
-        } catch (error) {
-            console.error("Error editing student profile:", error);
+    //             // Update the students state with the modified data
+    //             const updatedStudents = students.map((student) =>
+    //                 student.id === selectedRowId
+    //                     ? { ...student, name: editedName, email: editedEmail }
+    //                     : student
+    //             );
 
-            // Handle error, e.g., show an error message
-        }
+    //             setStudents(updatedStudents);
+
+    //             // Close the dialog
+    //             setDialogOpen(false);
+    //         } catch (error) {
+    //             console.error("Error editing student profile:", error);
+
+    //             // Handle error, e.g., show an error message
+    //         }
+    //     }
+    // };
+
+    const handleEditProfileSubmit = () => {
+        console.log("Button clicked");
     };
+
+    useEffect(() => {
+        console.log("useEffect - isDialogOpen:", isDialogOpen);
+        if (!isDialogOpen) {
+            // Perform any cleanup or additional actions here
+            setSelectedRowId(null);
+        }
+    }, [isDialogOpen]);
 
     return (
         <div className="w-full">
@@ -284,66 +342,37 @@ export function StudentsTable() {
                 </DropdownMenu>
             </div>
             {isDialogOpen && (
-                <Dialog onClose={() => setDialogOpen(false)}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>Edit profile</DialogTitle>
-                            <DialogDescription>
-                                Make changes to your profile here. Click save when you're done.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-right">
-                                    Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    defaultValue="Pedro Duarte"
-                                    className="col-span-3"
-                                    onChange={(event) =>
-                                        table.getColumn("name")?.setFilterValue(event.target.value)
-                                    }
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="email" className="text-right">
-                                    Email
-                                </Label>
-                                <Input
-                                    id="email"
-                                    defaultValue="pedro@example.com"
-                                    className="col-span-3"
-                                    onChange={(event) =>
-                                        table.getColumn("email")?.setFilterValue(event.target.value)
-                                    }
-                                />
-                            </div>
+                <Dialog>
+                    {/* ... (other JSX) */}
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="editedName" className="text-right">
+                                Name
+                            </Label>
+                            <Input
+                                id="editedName"
+                                value={editedName}
+                                onChange={(event) => setEditedName(event.target.value)}
+                                className="col-span-3"
+                            />
                         </div>
-                        <DialogFooter>
-                            <Button
-                                type="submit"
-                                onClick={() => {
-                                    console.log("Save Changes button clicked");
-                                    const id =
-                                        table.getFilteredSelectedRowModel().rows[0]?.original
-                                            .student_id;
-                                    const name = table
-                                        .getColumn("name")
-                                        ?.getFilterValue() as string;
-                                    const email = table
-                                        .getColumn("email")
-                                        ?.getFilterValue() as string;
-                                    if (id && name && email) {
-                                        handleEditProfileSubmit(id, name, email);
-                                        setDialogOpen(false);
-                                    }
-                                }}
-                            >
-                                Save changes
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="editedEmail" className="text-right">
+                                Email
+                            </Label>
+                            <Input
+                                id="editedEmail"
+                                value={editedEmail}
+                                onChange={(event) => setEditedEmail(event.target.value)}
+                                className="col-span-3"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit" onClick={handleEditProfileSubmit}>
+                            Save changes
+                        </Button>
+                    </DialogFooter>
                 </Dialog>
             )}
             <div className="rounded-md border">
