@@ -75,8 +75,10 @@ function Login() {
 
   return (
     <div className="flex flex-row w-full h-screen justify-center items-center">
-      <div className="w-2/4 bg-[#141f45] h-full">
-        <h1>hello world</h1>
+      <div className="w-2/4 bg-[#141f45] h-full flex items-center justify-center p-40">
+        <div>
+          <img src={"landing.png"} alt="Landing" />
+        </div>
       </div>
       <div className="bg-[#000517] flex flex-col justify-center items-center w-2/4 h-[100%] align-right">
         <Card
