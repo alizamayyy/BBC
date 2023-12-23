@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Navbar from "./navbar";
 import ProfileCard from "./profileCard";
+import ActiveUsersCard from "./activeUsersCard";
 
 function Posts() {
   const [user, setUser] = useState(null);
@@ -553,6 +554,7 @@ function Posts() {
           </div>
         </Card>
         {/* ActiveUsersCard component or any other component */}
+        <ActiveUsersCard />
       </div>
     </div>
   );
