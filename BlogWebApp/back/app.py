@@ -249,7 +249,7 @@ class Comment:
             comments = [
                 {
                     "id": comment[0],
-                    "post_id": comment[1],
+                    "id": comment[1],
                     "user_id": comment[2],
                     "content": comment[3],
                 }
@@ -389,7 +389,7 @@ def get_comment(comment_id):
         return (
             jsonify(
                 {
-                    "post_id": comment.post_id,
+                    "id": comment.post_id,
                     "user_id": comment.user_id,
                     "content": comment.content,
                 }
@@ -456,9 +456,12 @@ def get_posts_without_comments():
         posts_without_comments = cursor.fetchall()
         posts_without_comments = [
             {
-                "post_id": post[0],
-                "post_title": post[1],
-                "post_content": post[2],
+                "id": post[0],
+                "title": post[1],
+                "content": post[2],
+                "user_id": post[3],
+                "created_at": post[4],
+                "updated_at": post[5]
             }
             for post in posts_without_comments
         ]
@@ -466,6 +469,7 @@ def get_posts_without_comments():
     except pymysql.Error as e:
         print("Query failed:", e)
         return jsonify({"message": "Something went wrong"}), 500
+
 
 @app.route("/posts_authors_comments", methods=["GET"])
 def get_posts_authors_comments():
@@ -476,9 +480,9 @@ def get_posts_authors_comments():
         posts_authors_comments = cursor.fetchall()
         posts_authors_comments = [
             {
-                "post_id": post[0],
-                "post_title": post[1],
-                "post_content": post[2],
+                "id": post[0],
+                "title": post[1],
+                "content": post[2],
                 "author_username": post[3],
                 "comment_id": post[4],
                 "comment_content": post[5],

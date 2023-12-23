@@ -43,27 +43,35 @@ function Posts() {
 
     switch (filter) {
       case "Most Commented Posts":
+        console.log("Most Commented Posts");
         endpoint = "/most_commented_posts";
         break;
       case "Posts Without Comments":
+        console.log("Posts Without Comments");
         endpoint = "/posts_without_comments";
         break;
+      case "All Posts":
       default:
+        console.log("All Posts");
         endpoint = "/posts"; // replace with your default endpoint
     }
 
     axios
       .get("http://localhost:5000" + `${endpoint}`)
       .then((response) => {
-        const sortedPosts = response.data.sort((a, b) => {
-          // Sort in descending order based on the 'created_at' timestamp
-          return new Date(b.created_at) - new Date(a.created_at);
-        });
-        setPosts(sortedPosts);
-        // Loop through the posts and fetch the usernames of the authors
-        sortedPosts.forEach((post) => {
-          fetchUsername(post.user_id);
-        });
+        console.log("Response:", response);
+        if (response.data.length > 0) {
+          const sortedPosts = response.data.sort((a, b) => {
+            // Sort in descending order based on the 'created_at' timestamp
+            return new Date(b.created_at) - new Date(a.created_at);
+          });
+          setPosts(sortedPosts);
+          // Loop through the posts and fetch the usernames of the authors
+          sortedPosts.forEach((post) => {
+            console.log("Post:", post);
+            fetchUsername(post.user_id);
+          });
+        }
       })
       .catch((error) => {
         console.error("Error fetching posts:", error);
@@ -325,6 +333,13 @@ function Posts() {
               <h2 className="font-bold text-2xl text-center mb-4 mt-4 text-white">
                 Filters
               </h2>
+              <button
+                onClick={() => handleFilterClick("All Posts")}
+                className="my-5 text-white"
+              >
+                All Posts
+              </button>
+              <hr className="w-4/5" />
               <button
                 onClick={() => handleFilterClick("Most Commented Posts")}
                 className="my-5 text-white"

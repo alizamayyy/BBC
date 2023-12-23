@@ -204,13 +204,23 @@
     FROM posts
     INNER JOIN comments ON posts.id = comments.post_id
     GROUP BY posts.id
+    HAVING COUNT(*) > 0
     ORDER BY comment_count DESC;
-
+    
     CREATE OR REPLACE VIEW posts_without_comments AS
-    SELECT posts.id AS post_id, posts.title AS post_title, posts.content AS post_content
-    FROM comments
-    RIGHT JOIN posts ON comments.post_id = posts.id
-    WHERE comments.id IS NULL;
+    SELECT 
+        posts.id,
+        posts.title,
+        posts.content,
+        posts.user_id,
+        posts.created_at,
+        posts.updated_at
+    FROM 
+        posts
+    LEFT JOIN comments ON posts.id = comments.post_id
+    WHERE 
+        comments.id IS NULL;
+
 
     CREATE OR REPLACE VIEW posts_authors_comments AS
     SELECT 

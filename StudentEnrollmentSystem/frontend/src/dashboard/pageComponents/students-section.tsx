@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import Stats from "./stats";
-import { StudentsTable } from "./students-table";
+import StudentsTable from "./students-table";
 import StudentsInput from "./students-input";
 
 const StudentsSection = () => {
