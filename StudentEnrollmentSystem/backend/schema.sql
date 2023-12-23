@@ -299,6 +299,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- More Procedures
+
 DELIMITER $$
 DROP PROCEDURE IF EXISTS ReadClassDetail$$
 CREATE PROCEDURE ReadClassDetail(IN _class_id INT)
@@ -307,28 +309,6 @@ BEGIN
     FROM Class cl
     JOIN Course co ON cl.course_id = co.course_id
     JOIN Teacher t ON co.teacher_id = t.teacher_id
-    WHERE cl.class_id = _class_id;
-END$$
-DELIMITER ;
-
-
--- Drop and Create Procedures for Views
-DELIMITER $$
-DROP PROCEDURE IF EXISTS ReadCourseDetail$$
-CREATE PROCEDURE ReadCourseDetail()
-BEGIN
-    SELECT * FROM CourseDetailView;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS ReadClassDetail$$
-CREATE PROCEDURE ReadClassDetail(IN _class_id INT)
-BEGIN
-    SELECT cl.class_id, co.title, co.description, t.name as teacher_name, t.email as teacher_email
-    FROM Class cl
-    JOIN Course co ON cl.course_id = co.course_id
-    JOIN Teacher t ON cl.teacher_id = t.teacher_id
     WHERE cl.class_id = _class_id;
 END$$
 DELIMITER ;
@@ -394,13 +374,5 @@ DROP PROCEDURE IF EXISTS GetAllClasses$$
 CREATE PROCEDURE GetAllClasses()
 BEGIN
     SELECT * FROM Class;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS GetAllCourseDetails$$
-CREATE PROCEDURE GetAllCourseDetails()
-BEGIN
-    SELECT * FROM CourseDetailView;
 END$$
 DELIMITER ;
