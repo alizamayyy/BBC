@@ -137,27 +137,6 @@ export const columns: ColumnDef<Teacher>[] = [
       <div className="space-x-4 ml-10">
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">Assign Course</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Assign Course</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label htmlFor="courseName" className="text-left">
-                  Enter Course Name
-                </Label>
-                <Input id="courseName" className="col-span-3" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Assign Course</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Dialog>
-          <DialogTrigger asChild>
             <Button variant="outline">Edit Profile</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">

@@ -4,16 +4,37 @@ import { Label } from "@/components/ui/label";
 import { Input } from "../../components/ui/input";
 
 import { useState } from "react";
-// import { Calendar } from "@/components/ui/calendar";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 const TeachersInput = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  //   const [date, setDate] = useState<Date | undefined>();
 
-  //   const handleDateSelect = (selectedDate: Date) => {
-  //     setDate(selectedDate);
-  //   };
+  const createTeacher = async () => {
+    const apiUrl = "http://localhost:5000/teacher";
+
+    // Default class_id to 0
+    const requestBody = {
+      name,
+      email,
+    };
+
+    try {
+      const response = await axios.post(apiUrl, requestBody);
+
+      if (response.status === 200 || response.status === 201) {
+        console.log("Student created successfully");
+        console.log(response.data);
+        setName("");
+        setEmail("");
+      } else {
+        console.error("Failed to create teacher");
+      }
+    } catch (error) {
+      console.error("Error creating teacher", error);
+    }
+  };
 
   return (
     <div className="flex justify-center h-fit">
@@ -40,20 +61,12 @@ const TeachersInput = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        {/* <div className="">
-          <p className="text-sm font-semibold">Date of Birth</p>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            className="rounded-md ml-16"
-          />
-          {date && (
-            <p className="text-sm mt-2">
-              Selected Date: {date.toLocaleDateString()}
-            </p>
-          )}
-        </div> */}
+        <Button
+          onClick={createTeacher}
+          className="bg-blue-500 text-white rounded-lg px-4 py-2"
+        >
+          Create Teacher
+        </Button>
       </div>
     </div>
   );
