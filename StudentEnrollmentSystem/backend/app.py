@@ -288,18 +288,6 @@ def get_number_of_classes():
     return jsonify({'count': results[0][0]}), 200
 
 # View Routes
-@app.route('/course-detail-view', methods=['GET'])
-def course_detail_view():
-    results = execute_procedure('ReadCourseDetail', [])
-    
-    # Updated labels to match the new column names
-    labels = ["course_id", "title", "description", "schedule_time", "teacher_name", "class_name"]
-    
-    # Mapping results to a list of dictionaries
-    results = [dict(zip(labels, result)) for result in results]
-    
-    return jsonify(results), 200
-
 
 @app.route('/class/<int:class_id>/detail', methods=['GET'])
 def class_detail_view(class_id):

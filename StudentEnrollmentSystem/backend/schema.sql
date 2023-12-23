@@ -290,15 +290,6 @@ JOIN Class cl ON c.class_id = cl.class_id
 JOIN Teacher t ON c.teacher_id = t.teacher_id;
 
 
--- Drop and Create Procedures for Views
-DELIMITER $$
-DROP PROCEDURE IF EXISTS ReadCourseDetail$$
-CREATE PROCEDURE ReadCourseDetail()
-BEGIN
-    SELECT * FROM CourseDetailView;
-END$$
-DELIMITER ;
-
 -- More Procedures
 
 DELIMITER $$
@@ -374,5 +365,13 @@ DROP PROCEDURE IF EXISTS GetAllClasses$$
 CREATE PROCEDURE GetAllClasses()
 BEGIN
     SELECT * FROM Class;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAllCourseDetails$$
+CREATE PROCEDURE GetAllCourseDetails()
+BEGIN
+    SELECT * FROM CourseDetailView;
 END$$
 DELIMITER ;
