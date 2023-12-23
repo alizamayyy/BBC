@@ -42,7 +42,7 @@ import {
 } from "../../components/ui/table";
 
 export type Class = {
-    class_id: number;
+    id: number;
     class_name: string;
 };
 
@@ -52,6 +52,18 @@ export function ClassesTable() {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    const handleDelete = (classId: number) => {
+        // Make a DELETE request to delete the class with the given ID
+        axios
+            .delete(`http://localhost:5000/class/${classId}`)
+            .then(() => {
+                // Remove the deleted class from the state
+                setData((prevData) => prevData.filter((classItem) => classItem.id !== classId));
+                console.log(`Class with ID ${classId} deleted successfully.`);
+            })
+            .catch((error) => console.error(`Error deleting class with ID ${classId}:`, error));
+    };
 
     React.useEffect(() => {
         // Fetch data from the API using Axios
@@ -85,9 +97,9 @@ export function ClassesTable() {
             enableHiding: false,
         },
         {
-            accessorKey: "class_id",
+            accessorKey: "id",
             header: "Class ID",
-            cell: ({ row }) => <div className="container">{row.getValue("class_id")}</div>,
+            cell: ({ row }) => <div className="container">{row.getValue("id")}</div>,
         },
         {
             accessorKey: "class_name",
@@ -130,7 +142,7 @@ export function ClassesTable() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button variant="destructive" onClick={() => console.log("Delete")}>
+                    <Button variant="destructive" onClick={() => handleDelete(row.original.id)}>
                         Delete
                     </Button>
                 </div>

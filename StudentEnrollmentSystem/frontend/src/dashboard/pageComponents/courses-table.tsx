@@ -42,7 +42,7 @@ import {
 
 import axios from "axios";
 export type Course = {
-    course_id: number;
+    id: number;
     title: string;
     description: string;
     schedule: string;
@@ -54,6 +54,18 @@ export function CoursesTable() {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    const handleDelete = (courseId: number) => {
+        // Make a DELETE request to delete the course with the given ID
+        axios
+            .delete(`http://localhost:5000/course/${courseId}`)
+            .then(() => {
+                // Remove the deleted course from the state
+                setData((prevData) => prevData.filter((course) => course.id !== courseId));
+                console.log(`Course with ID ${courseId} deleted successfully.`);
+            })
+            .catch((error) => console.error(`Error deleting course with ID ${courseId}:`, error));
+    };
 
     React.useEffect(() => {
         // Fetch data from the API using Axios
@@ -175,7 +187,7 @@ export function CoursesTable() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button variant="destructive" onClick={() => console.log("Delete")}>
+                    <Button variant="destructive" onClick={() => handleDelete(row.original.id)}>
                         Delete
                     </Button>
                 </div>
