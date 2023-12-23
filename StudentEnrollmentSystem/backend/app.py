@@ -206,8 +206,8 @@ def student_operations(id):
         student = Student(None, None, None, None)
         return student.read('ReadStudent', id)
     elif request.method == 'PUT':
-        student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'], request.json['class_id'])
-        return student.update('UpdateStudent', id, [student.name, student.email, student.date_of_birth, student.class_id])
+        student = Student(request.json['name'], request.json['email'], None, None)
+        return student.update('UpdateStudent', id, [student.name, student.email])
     elif request.method == 'DELETE':
         student = Student(None, None, None, None)
         return student.delete('DeleteStudent', id)
