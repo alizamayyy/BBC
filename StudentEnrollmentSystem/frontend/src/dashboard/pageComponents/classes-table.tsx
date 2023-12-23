@@ -85,9 +85,9 @@ export function ClassesTable() {
             enableHiding: false,
         },
         {
-            accessorKey: "class_id",
+            accessorKey: "id",
             header: "Class ID",
-            cell: ({ row }) => <div className="container">{row.getValue("class_id")}</div>,
+            cell: ({ row }) => <div className="container">{row.getValue("id")}</div>,
         },
         {
             accessorKey: "class_name",
