@@ -30,6 +30,15 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export type Teacher = {
   teacher_id: number;
@@ -126,12 +135,54 @@ export const columns: ColumnDef<Teacher>[] = [
     header: "",
     cell: ({ row }) => (
       <div className="space-x-4 ml-10">
-        <Button variant="outline" onClick={() => console.log("Assign Class")}>
-          Assign Course
-        </Button>
-        <Button variant="outline" onClick={() => console.log("Edit")}>
-          Edit
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Assign Course</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Assign Course</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 items-center gap-4">
+                <Label htmlFor="courseName" className="text-left">
+                  Enter Course Name
+                </Label>
+                <Input id="courseName" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Assign Course</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit Profile</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Profile</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input id="name" className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email
+                </Label>
+                <Input id="email" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Button variant="destructive" onClick={() => console.log("Delete")}>
           Delete
         </Button>
