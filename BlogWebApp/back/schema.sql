@@ -167,11 +167,12 @@
     -- Get All Posts via User ID
     DELIMITER $$
     DROP PROCEDURE IF EXISTS GetAllPostsByUserId$$
-    CREATE PROCEDURE GetAllPostsByUserId(IN user_id INT)
+    CREATE PROCEDURE GetAllPostsByUserId(IN in_user_id INT)
     BEGIN
-        SELECT * FROM posts WHERE user_id = user_id;
+        SELECT * FROM posts WHERE user_id = in_user_id;
     END$$
     DELIMITER ;
+
 
     -- Triggers
     

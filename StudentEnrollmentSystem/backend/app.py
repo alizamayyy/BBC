@@ -193,6 +193,33 @@ def get_number_of_admins():
     results = execute_procedure('GetNumberOfAdmins', [])
     return jsonify({'count': results[0][0]}), 200
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data['email']
+    password = data['password']
+
+    # Retrieve admin by email using the stored procedure
+    results = execute_procedure('GetAdminByEmail', [email])
+
+    if results:
+        # Check if the provided password matches the stored password
+        stored_password = results[0][3]  # Assuming the password is the third column in the Admin table
+        if stored_password == password:
+            # Construct response in the same format as the second example
+            admin_data = {
+                "email": email,  # Adjust based on your Admin model attributes
+                "password": stored_password,  # Assuming you want to return the stored password
+                "id": results[0][0],  # Assuming the ID is in the first column
+                "name": results[0][1]  # Assuming the name is in the second column
+            }
+            return jsonify(admin_data), 200
+        else:
+            return jsonify({'message': 'Incorrect password'}), 401
+    else:
+        return jsonify({'message': 'Admin not found'}), 404
+
+
 # Student Routes
 @app.route('/student', methods=['POST'])
 def create_student():

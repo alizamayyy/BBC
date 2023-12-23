@@ -90,6 +90,15 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- Drop and Create GetAdminByEmail Procedure
+DELIMITER $$
+DROP PROCEDURE IF EXISTS GetAdminByEmail$$
+CREATE PROCEDURE GetAdminByEmail(IN _email VARCHAR(255))
+BEGIN
+    SELECT * FROM Admin WHERE email = _email;
+END$$
+DELIMITER ;
+
 
 
 -- Drop and Create Student Procedures
