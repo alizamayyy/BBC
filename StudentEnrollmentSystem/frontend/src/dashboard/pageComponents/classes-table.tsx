@@ -30,6 +30,15 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export type Class = {
   class_id: number;
@@ -115,9 +124,27 @@ export const columns: ColumnDef<Class>[] = [
     header: "",
     cell: ({ row }) => (
       <div className="space-x-4 ml-10">
-        <Button variant="outline" onClick={() => console.log("Edit")}>
-          Edit
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit Class</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Class</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="className" className="text-right">
+                  Class Name
+                </Label>
+                <Input id="className" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Button variant="destructive" onClick={() => console.log("Delete")}>
           Delete
         </Button>

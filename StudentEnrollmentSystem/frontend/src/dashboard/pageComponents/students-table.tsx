@@ -30,6 +30,17 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export type Student = {
   student_id: number;
@@ -77,90 +88,134 @@ export const students: Student[] = [
   },
 ];
 
-export const columns: ColumnDef<Student>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "student_id",
-    header: "Student ID",
-    cell: ({ row }) => (
-      <div className="container">{row.getValue("student_id")}</div>
-    ),
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <div className="">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+export function StudentsTable() {
+  const [isDialogOpen, setDialogOpen] = React.useState(false);
+  const isDialogOpenRef = React.useRef(isDialogOpen);
+  isDialogOpenRef.current = isDialogOpen;
+  const columns: ColumnDef<Student>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "student_id",
+      header: "Student ID",
+      cell: ({ row }) => (
+        <div className="container">{row.getValue("student_id")}</div>
+      ),
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) => {
+        return (
+          <div className="">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Name
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="container lowercase">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => <div className="">{row.getValue("email")}</div>,
+    },
+
+    {
+      accessorKey: "date_of_birth",
+      header: "Date of Birth",
+      cell: ({ row }) => <div>{row.getValue("date_of_birth")}</div>,
+    },
+    {
+      accessorKey: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <div className="space-x-4 ml-10">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Assign Class</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Assign Class</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="className" className="text-right">
+                    Enter Class Name
+                  </Label>
+                  <Input id="className" className="col-span-3" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Assign</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Edit Profile</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit Profile</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input id="name" className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input id="email" className="col-span-3" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Button variant="destructive" onClick={() => console.log("Delete")}>
+            Delete
           </Button>
         </div>
-      );
+      ),
     },
-    cell: ({ row }) => (
-      <div className="container lowercase">{row.getValue("name")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="">{row.getValue("email")}</div>,
-  },
-
-  {
-    accessorKey: "date_of_birth",
-    header: "Date of Birth",
-    cell: ({ row }) => <div>{row.getValue("date_of_birth")}</div>,
-  },
-  {
-    accessorKey: "actions",
-    header: "",
-    cell: ({ row }) => (
-      <div className="space-x-4 ml-10">
-        <Button variant="outline" onClick={() => console.log("Assign Class")}>
-          Assign
-        </Button>
-        <Button variant="outline" onClick={() => console.log("Edit")}>
-          Edit
-        </Button>
-        <Button variant="destructive" onClick={() => console.log("Delete")}>
-          Delete
-        </Button>
-      </div>
-    ),
-  },
-];
-
-export function StudentsTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  ];
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -218,6 +273,38 @@ export function StudentsTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {isDialogOpen && (
+        <Dialog onClose={() => setDialogOpen(false)}>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit Profile</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <DialogDescription>
+                Make changes to your profile here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              {/* Add your form or content here */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  defaultValue="Pedro Duarte"
+                  className="col-span-3"
+                />
+              </div>
+              {/* ... other form fields */}
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
