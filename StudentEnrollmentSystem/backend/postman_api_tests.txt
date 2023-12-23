@@ -89,7 +89,8 @@ http://localhost:5000/course
     "title": "Math",
     "description": "Explore mathematical theories",
     "class_id": 1,
-    "schedule_time": "2023-01-01 10:00:00"
+    "schedule_time": "2023-01-01 10:00:00",
+    "teacher_id": 1
 }
 
 # Test case for getting a course by id
