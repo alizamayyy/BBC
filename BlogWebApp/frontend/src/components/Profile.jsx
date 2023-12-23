@@ -7,7 +7,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import ActiveUsersCard from "./activeUsersCard";
 import Navbar from "./navbar";
 
 const Profile = () => {
@@ -363,7 +362,6 @@ const Profile = () => {
                         </ul>
                     </div>
                 </Card>
-                <ActiveUsersCard />
             </div>
             {/* Edit user dialog */}
             <Dialog open={editUser} onClose={handleEditUserClose}>

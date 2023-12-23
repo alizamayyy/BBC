@@ -1,9 +1,9 @@
 import Card from "@mui/material/Card";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ActiveUsersCard from "./activeUsersCard";
 import Navbar from "./navbar";
 import ProfileCard from "./profileCard";
+import ActiveUsersCard from "./activeUsersCard";
 
 function Posts() {
   const [user, setUser] = useState(null);
@@ -15,15 +15,14 @@ function Posts() {
     content: "",
   });
   const [comments, setComments] = useState([]);
-  const [commentStates, setCommentStates] = useState({}); // New state for comment text areas
+  const [commentStates, setCommentStates] = useState({});
   const [editingComment, setEditingComment] = useState(null);
   const [editedCommentData, setEditedCommentData] = useState({ content: "" });
-  const [usernames, setUsernames] = useState({}); // New state for storing usernames
+  const [usernames, setUsernames] = useState({});
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const userDataString = localStorage.getItem("user");
-
     if (userDataString) {
       const user = JSON.parse(userDataString);
       setUser(user);
@@ -32,46 +31,34 @@ function Posts() {
 
   useEffect(() => {
     fetchPosts();
-  }, [newPost, editingPost, filter]);
-
-  useEffect(() => {
     fetchComments();
-  }, []);
+  }, [newPost, editingPost, filter]);
 
   const fetchPosts = () => {
     let endpoint = "";
-
     switch (filter) {
       case "Most Commented Posts":
-        console.log("Most Commented Posts");
         endpoint = "/most_commented_posts";
         break;
       case "Posts Without Comments":
-        console.log("Posts Without Comments");
         endpoint = "/posts_without_comments";
         break;
       case "All Posts":
       default:
-        console.log("All Posts");
-        endpoint = "/posts"; // replace with your default endpoint
+        endpoint = "/posts";
+        break;
     }
 
     axios
-      .get("http://localhost:5000" + `${endpoint}`)
+      .get(`http://localhost:5000${endpoint}`)
       .then((response) => {
-        console.log("Response:", response);
-        if (response.data.length > 0) {
-          const sortedPosts = response.data.sort((a, b) => {
-            // Sort in descending order based on the 'created_at' timestamp
-            return new Date(b.created_at) - new Date(a.created_at);
-          });
-          setPosts(sortedPosts);
-          // Loop through the posts and fetch the usernames of the authors
-          sortedPosts.forEach((post) => {
-            console.log("Post:", post);
-            fetchUsername(post.user_id);
-          });
-        }
+        const sortedPosts = response.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setPosts(sortedPosts);
+        sortedPosts.forEach((post) => {
+          fetchUsername(post.user_id);
+        });
       })
       .catch((error) => {
         console.error("Error fetching posts:", error);
@@ -83,7 +70,6 @@ function Posts() {
       .get("http://localhost:5000/comments")
       .then((response) => {
         setComments(response.data);
-        // Loop through the comments and fetch the usernames of the authors
         response.data.forEach((comment) => {
           fetchUsername(comment.user_id);
         });
@@ -93,26 +79,20 @@ function Posts() {
       });
   };
 
-  // A helper function to fetch the username of a user by user_id
   const fetchUsername = (user_id) => {
-    // Check if the username is already in the state
-    if (usernames[user_id]) {
-      return;
+    if (!usernames[user_id]) {
+      axios
+        .get(`http://localhost:5000/users/${user_id}`)
+        .then((response) => {
+          setUsernames((prevUsernames) => ({
+            ...prevUsernames,
+            [user_id]: response.data.username,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error fetching username:", error);
+        });
     }
-    // Otherwise, make a request to the API
-
-    axios
-      .get(`http://localhost:5000/users/${user_id}`)
-      .then((response) => {
-        // Update the usernames state with the new username
-        setUsernames((prevUsernames) => ({
-          ...prevUsernames,
-          [user_id]: response.data.username,
-        }));
-      })
-      .catch((error) => {
-        console.error("Error fetching username:", error);
-      });
   };
 
   const handleCreatePost = async () => {
@@ -123,38 +103,15 @@ function Posts() {
         user_id: user.id,
       };
 
-      const response = await axios.post(
-        "http://localhost:5000/posts",
-        postData
-      );
-
-      setPosts([...posts, response.data]);
+      await axios.post("http://localhost:5000/posts", postData);
       setNewPost({ title: "", content: "" });
+      fetchPosts();
     } catch (error) {
       console.error("Error creating post:", error);
     }
   };
 
-  const handleUpdatePost = (postId) => {
-    const postToEdit = posts.find((post) => post.id === postId);
-
-    if (postToEdit && user && postToEdit.user_id === user.id) {
-      setEditingPost(postId);
-      setEditedPostData({
-        title: postToEdit.title,
-        content: postToEdit.content,
-      });
-    } else {
-      console.error("You do not have permission to edit this post.");
-    }
-  };
-
-  const handleEditInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedPostData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleEditSubmit = async () => {
+  const handleUpdatePost = async () => {
     try {
       const updatedPost = {
         title: editedPostData.title,
@@ -165,147 +122,127 @@ function Posts() {
         `http://localhost:5000/posts/${editingPost}`,
         updatedPost
       );
-
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === editingPost ? { ...post, ...updatedPost } : post
-        )
-      );
-
       setEditingPost(null);
+      fetchPosts();
     } catch (error) {
       console.error("Error updating post:", error);
     }
   };
 
-  const handleDeletePost = (postId) => {
-    const postToDelete = posts.find((post) => post.id === postId);
-
-    if (postToDelete && user && postToDelete.user_id === user.id) {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete this post?"
-      );
-
-      if (confirmed) {
-        axios
-          .delete(`http://localhost:5000/posts/${postId}`)
-          .then(() => {
-            const updatedPosts = posts.filter((post) => post.id !== postId);
-            setPosts(updatedPosts);
-          })
-          .catch((error) => {
-            console.error("Error deleting post:", error);
-          });
-      }
-    } else {
-      console.error("You do not have permission to delete this post.");
+  const handleDeletePost = async (postId) => {
+    try {
+      await axios.delete(`http://localhost:5000/posts/${postId}`);
+      fetchPosts();
+    } catch (error) {
+      console.error("Error deleting post:", error);
     }
   };
 
   const handleCreateComment = async (postId) => {
     try {
       const commentData = {
-        content: commentStates[postId]?.content || "", // Use specific comment state
+        content: commentStates[postId]?.content || "",
         user_id: user.id,
         post_id: postId,
       };
 
-      const response = await axios.post(
-        "http://localhost:5000/comments",
-        commentData
-      );
-
+      await axios.post("http://localhost:5000/comments", commentData);
       setCommentStates((prevStates) => ({
         ...prevStates,
         [postId]: { content: "" },
       }));
-
-      // Fetch the updated comments from the server
-      await fetchComments();
-
-      // Now update the local state with the new comment
-      setComments((prevComments) => [...prevComments, response.data]);
+      fetchComments();
     } catch (error) {
       console.error("Error creating comment:", error);
     }
   };
 
-  const handleUpdateComment = (commentId) => {
-    const commentToEdit = comments.find((comment) => comment.id === commentId);
-
-    if (commentToEdit && user && commentToEdit.user_id === user.id) {
-      setEditingComment(commentId);
-      setEditedCommentData({ content: commentToEdit.content });
-    } else {
-      console.error("You do not have permission to edit this comment.");
-    }
-  };
-
-  const handleEditCommentInputChange = (e) => {
-    const { value } = e.target;
-    setEditedCommentData((prevData) => ({
-      ...prevData,
-      content: value,
-    }));
-  };
-
-  const handleEditCommentSubmit = async (commentId) => {
+  const handleUpdateComment = async () => {
     try {
       const updatedComment = {
         content: editedCommentData.content,
       };
 
       await axios.put(
-        `http://localhost:5000/comments/${commentId}`,
+        `http://localhost:5000/comments/${editingComment}`,
         updatedComment
       );
-
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment.id === commentId ? { ...comment, ...updatedComment } : comment
-        )
-      );
-
       setEditingComment(null);
+      fetchComments();
     } catch (error) {
       console.error("Error updating comment:", error);
     }
   };
 
-  const handleDeleteComment = (commentId) => {
-    const commentToDelete = comments.find(
-      (comment) => comment.id === commentId
-    );
-
-    if (commentToDelete && user && commentToDelete.user_id === user.id) {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete this comment?"
-      );
-
-      if (confirmed) {
-        axios
-          .delete(`http://localhost:5000/comments/${commentId}`)
-          .then(() => {
-            const updatedComments = comments.filter(
-              (comment) => comment.id !== commentId
-            );
-            setComments(updatedComments);
-          })
-          .catch((error) => {
-            console.error("Error deleting comment:", error);
-          });
-      }
-    } else {
-      console.error("You do not have permission to delete this comment.");
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await axios.delete(`http://localhost:5000/comments/${commentId}`);
+      fetchComments();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
     }
   };
 
-  const getCommentsForPost = (postId) => {
-    return comments.filter((comment) => comment.post_id === postId);
+  const handleEditInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditedPostData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleFilterClick = (filterName) => {
     setFilter(filterName);
+  };
+
+  function getCommentsForPost(postId) {
+    console.log(comments);
+    return comments.filter((comment) => comment.post_id === postId);
+  }
+
+  const handleEditCommentInputChange = (event, commentId) => {
+    const { value } = event.target;
+    setEditedCommentData({ content: value });
+    setEditingComment(commentId);
+  };
+
+  const handleEditCommentSubmit = async (commentId) => {
+    try {
+      // Make an API call to update the comment
+      await axios.put(
+        `http://localhost:5000/comments/${commentId}`,
+        editedCommentData
+      );
+
+      // Update the comments in the frontend to reflect the change
+      // This might involve fetching the updated comments list or updating the state directly
+      fetchComments();
+
+      // Reset the editing state
+      setEditingComment(null);
+      setEditedCommentData({ content: "" });
+    } catch (error) {
+      console.error("Error updating comment:", error);
+    }
+  };
+  const handleEditSubmit = async () => {
+    try {
+      // Make an API call to update the post
+      await axios.put(
+        `http://localhost:5000/posts/${editingPost}`,
+        editedPostData
+      );
+
+      // Update the posts in the frontend to reflect the changes
+      // This could involve fetching the updated posts list or updating the state directly
+      fetchPosts();
+
+      // Reset the editing state
+      setEditingPost(null);
+      setEditedPostData({ title: "", content: "" });
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
   };
 
   return (
@@ -400,7 +337,6 @@ function Posts() {
                 </div>
               </form>
             </div>
-            {/* Display the filter if present */}
             {filter && (
               <div className="mt-4 mb-4">
                 <h2 className="text-white text-lg font-semibold">{filter}:</h2>
@@ -482,7 +418,13 @@ function Posts() {
                             </button>
                             <button
                               className="bg-[#6788ff] hover:bg-blue-700 w-1/4 text-white text-sm font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-5 float-right"
-                              onClick={() => handleUpdatePost(post.id)}
+                              onClick={() => {
+                                setEditingPost(post.id);
+                                setEditedPostData({
+                                  title: post.title,
+                                  content: post.content,
+                                });
+                              }}
                             >
                               Update Post
                             </button>
@@ -494,6 +436,7 @@ function Posts() {
                       <h3 className="text-white text-lg font-semibold mb-2 mt-4">
                         Comments
                       </h3>
+                      {console.log(getCommentsForPost(1))}
                       {getCommentsForPost(post.id).map((comment) => (
                         <div key={comment.id}>
                           <div className="flex flex-row space-x-2 ml-4 text-white">
@@ -522,7 +465,6 @@ function Posts() {
                               {comment.content}
                             </p>
                           </div>
-
                           {editingComment === comment.id ? (
                             <div>
                               <textarea
@@ -548,9 +490,12 @@ function Posts() {
                                 <div className="ml-11">
                                   <button
                                     className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline mb-4 mt-3"
-                                    onClick={() =>
-                                      handleUpdateComment(comment.id)
-                                    }
+                                    onClick={() => {
+                                      setEditingComment(comment.id);
+                                      setEditedCommentData({
+                                        content: comment.content,
+                                      });
+                                    }}
                                   >
                                     Update Comment
                                   </button>
@@ -595,7 +540,6 @@ function Posts() {
                           }
                         />
                       </div>
-
                       <button
                         className="bg-[#6788ff] hover:bg-blue-700 w-4/12 text-xs text-white font-bold px-2 rounded-xl focus:outline-none focus:shadow-outline h-7 mb-4 mt-3 ml-48"
                         onClick={() => handleCreateComment(post.id)}
@@ -609,6 +553,7 @@ function Posts() {
             </div>
           </div>
         </Card>
+        {/* ActiveUsersCard component or any other component */}
         <ActiveUsersCard />
       </div>
     </div>
