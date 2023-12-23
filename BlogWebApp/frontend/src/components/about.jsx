@@ -2,6 +2,7 @@ import Navbar from "./navbar";
 import { Card } from "@mui/material";
 import alizaImage from "/aliza.jpg";
 import biancaImage from "/bianca.jpg";
+import badillaImage from "/badilla.jpg";
 
 const about = () => {
   return (
@@ -53,7 +54,7 @@ const about = () => {
                 boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               }}
             >
-              <img src={alizaImage} alt="Aliza" className="w-full h-full" />
+              <img src={badillaImage} alt="Aliza" className="w-full h-full" />
             </Card>
             <p className="mt-5 text-lg font-bold text-white text-center">
               Mark Badilla
