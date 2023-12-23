@@ -3,7 +3,8 @@ POST
 http://localhost:5000/admin
 {
     "name": "Alice",
-    "email": "alice@example.com"
+    "email": "alice@example.com",
+    "password": "securepassword"
 }
 
 # Test case for getting an admin by id
@@ -16,7 +17,8 @@ PUT
 http://localhost:5000/admin/1
 {
     "name": "Bob",
-    "email": "bob@example.com"
+    "email": "bob@example.com",
+    "password": "newsecurepassword"
 }
 
 # Test case for deleting an admin by id
@@ -30,7 +32,8 @@ http://localhost:5000/student
 {
     "name": "Charlie",
     "email": "charlie@example.com",
-    "date_of_birth": "2000-01-01"
+    "date_of_birth": "2000-01-01",
+    "class_id": 1
 }
 
 # Test case for getting a student by id
@@ -44,7 +47,8 @@ http://localhost:5000/student/1
 {
     "name": "David",
     "email": "david@example.com",
-    "date_of_birth": "2000-02-02"
+    "date_of_birth": "2000-02-02",
+    "class_id": 1
 }
 
 # Test case for deleting a student by id
@@ -83,7 +87,10 @@ POST
 http://localhost:5000/course
 {
     "title": "Math",
-    "description": "Learn basic math concepts"
+    "description": "Explore mathematical theories",
+    "class_id": 1,
+    "schedule_time": "2023-01-01 10:00:00",
+    "teacher_id": 1
 }
 
 # Test case for getting a course by id
@@ -96,7 +103,9 @@ PUT
 http://localhost:5000/course/1
 {
     "title": "Math",
-    "description": "Learn advanced math concepts"
+    "description": "Learn advanced math concepts",
+    "class_id": 1,
+    "schedule_time": "2023-01-01 11:00:00"
 }
 
 # Test case for deleting a course by id
@@ -108,9 +117,7 @@ http://localhost:5000/course/1
 POST
 http://localhost:5000/class
 {
-    "course_id": 1,
-    "teacher_id": 1,
-    "schedule_time": "2023-01-01 10:00:00"
+    "class_name": "Class A"
 }
 
 # Test case for getting a class by id
@@ -122,9 +129,7 @@ http://localhost:5000/class/1
 PUT
 http://localhost:5000/class/1
 {
-    "course_id": 1,
-    "teacher_id": 1,
-    "schedule_time": "2023-01-01 11:00:00"
+    "class_name": "Class B"
 }
 
 # Test case for deleting a class by id
