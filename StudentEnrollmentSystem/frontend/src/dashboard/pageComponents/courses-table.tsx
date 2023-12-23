@@ -30,6 +30,15 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export type Course = {
   course_id: number;
@@ -137,9 +146,35 @@ export const columns: ColumnDef<Course>[] = [
     header: "",
     cell: ({ row }) => (
       <div className="space-x-4 ml-10">
-        <Button variant="outline" onClick={() => console.log("Edit")}>
-          Edit
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit Course</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Course</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="title" className="text-left">
+                  Course Title
+                </Label>
+                <Input id="title" className="col-span-3" />
+                <Label htmlFor="description" className="text-left">
+                  Description
+                </Label>
+                <Input id="description" className="col-span-3" />
+                <Label htmlFor="schedule" className="text-left">
+                  Schedule
+                </Label>
+                <Input id="schedule" className="col-span-3" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <Button variant="destructive" onClick={() => console.log("Delete")}>
           Delete
         </Button>
