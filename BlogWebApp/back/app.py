@@ -285,7 +285,13 @@ def update_user(user_id):
     user = User.get_by_id(user_id)
     if user:
         user.update(new_username, new_password)
-        return jsonify({"message": "User updated successfully"}), 200
+        updated_user = User.get_by_id(user_id)  # Retrieve the updated user data
+        return (
+            jsonify(
+                {"username": user.username, "password": user.password, "id": user.id}
+            ),
+            200,
+        )
     return jsonify({"message": "User not found"}), 404
 
 @app.route("/users/<int:user_id>", methods=["DELETE"])

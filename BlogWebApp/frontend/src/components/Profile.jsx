@@ -92,7 +92,10 @@ const Profile = () => {
             })
             .then((response) => {
                 setUser(response.data);
+
+                // Update user in localStorage
                 localStorage.setItem("user", JSON.stringify(response.data));
+
                 alert("User updated successfully!");
             })
             .catch((error) => console.error("Error updating user:", error));
