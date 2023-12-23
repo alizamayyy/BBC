@@ -79,20 +79,10 @@ class Admin(Person):
 
 # Student class inherits from Person
 class Student(Person):
-    def __init__(self, name, email, date_of_birth):
+    def __init__(self, name, email, date_of_birth, class_id):
         super().__init__(name, email)
         self.date_of_birth = date_of_birth
-
-# Teacher class inherits from Person
-class Teacher(Person):
-    def __init__(self, name, email):
-        super().__init__(name, email)
-
-# Course class
-class Course:
-    def __init__(self, title, description):
-        self.title = title
-        self.description = description
+        self.class_id = class_id
 
     def create(self, proc_name, args):
         data = request.json
@@ -102,7 +92,7 @@ class Course:
     def read(self, proc_name, id):
         results = execute_procedure(proc_name, [id])
         # Add labels to the results
-        labels = ["id", "title", "description"]
+        labels = ["id", "name", "email", "date_of_birth", "class_id"]
         results = [dict(zip(labels, result)) for result in results]
         return jsonify(results), 200
 
@@ -115,10 +105,18 @@ class Course:
         execute_procedure(proc_name, [id])
         return '', 204
 
-# Class class
-class Class:
-    def __init__(self, course_id, teacher_id, schedule_time):
-        self.course_id = course_id
+
+# Teacher class inherits from Person
+class Teacher(Person):
+    def __init__(self, name, email):
+        super().__init__(name, email)
+
+# Course class
+class Course:
+    def __init__(self, title, description, class_id, teacher_id, schedule_time):
+        self.title = title
+        self.description = description
+        self.class_id = class_id
         self.teacher_id = teacher_id
         self.schedule_time = schedule_time
 
@@ -130,7 +128,34 @@ class Class:
     def read(self, proc_name, id):
         results = execute_procedure(proc_name, [id])
         # Add labels to the results
-        labels = ["id", "course_id", "teacher_id", "schedule_time"]
+        labels = ["id", "title", "description", "class_id", "teacher_id", "schedule_time"]
+        results = [dict(zip(labels, result)) for result in results]
+        return jsonify(results), 200
+
+    def update(self, proc_name, id, args):
+        data = request.json
+        execute_procedure(proc_name, [id] + args)
+        return jsonify(data), 200
+
+    def delete(self, proc_name, id):
+        execute_procedure(proc_name, [id])
+        return '', 204
+
+
+# Class class
+class Class:
+    def __init__(self, class_name):
+        self.class_name = class_name
+
+    def create(self, proc_name, args):
+        data = request.json
+        execute_procedure(proc_name, args)
+        return jsonify(data), 201
+
+    def read(self, proc_name, id):
+        results = execute_procedure(proc_name, [id])
+        # Add labels to the results
+        labels = ["id", "class_name"]
         results = [dict(zip(labels, result)) for result in results]
         return jsonify(results), 200
 
@@ -169,20 +194,22 @@ def get_number_of_admins():
 # Student Routes
 @app.route('/student', methods=['POST'])
 def create_student():
-    student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'])
-    return student.create('CreateStudent', [student.name, student.email, student.date_of_birth])
+    student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'], request.json['class_id'])
+    return student.create('CreateStudent', [student.name, student.email, student.date_of_birth, student.class_id])
+
 
 @app.route('/student/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def student_operations(id):
     if request.method == 'GET':
-        student = Student(None, None, None)
+        student = Student(None, None, None, None)
         return student.read('ReadStudent', id)
     elif request.method == 'PUT':
-        student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'])
-        return student.update('UpdateStudent', id, [student.name, student.email, student.date_of_birth])
+        student = Student(request.json['name'], request.json['email'], request.json['date_of_birth'], request.json['class_id'])
+        return student.update('UpdateStudent', id, [student.name, student.email, student.date_of_birth, student.class_id])
     elif request.method == 'DELETE':
-        student = Student(None, None, None)
+        student = Student(None, None, None, None)
         return student.delete('DeleteStudent', id)
+
 
 @app.route('/student/count', methods=['GET'])
 def get_number_of_students():
@@ -215,20 +242,21 @@ def get_number_of_teachers():
 # Course Routes
 @app.route('/course', methods=['POST'])
 def create_course():
-    course = Course(request.json['title'], request.json['description'])
-    return course.create('CreateCourse', [course.title, course.description])
+    course = Course(request.json['title'], request.json['description'], request.json['class_id'], request.json['teacher_id'], request.json['schedule_time'])
+    return course.create('CreateCourse', [course.title, course.description, course.class_id, course.teacher_id, course.schedule_time])
 
 @app.route('/course/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def course_operations(id):
     if request.method == 'GET':
-        course = Course(None, None)
+        course = Course(None, None, None, None, None)
         return course.read('ReadCourse', id)
     elif request.method == 'PUT':
-        course = Course(request.json['title'], request.json['description'])
-        return course.update('UpdateCourse', id, [course.title, course.description])
+        course = Course(request.json['title'], request.json['description'], request.json['class_id'], request.json['teacher_id'], request.json['schedule_time'])
+        return course.update('UpdateCourse', id, [course.title, course.description, course.class_id, course.teacher_id, course.schedule_time])
     elif request.method == 'DELETE':
-        course = Course(None, None)
+        course = Course(None, None, None, None, None)
         return course.delete('DeleteCourse', id)
+
 
 @app.route('/class/<int:class_id>/course/count', methods=['GET'])
 def get_number_of_courses_per_class(class_id):
@@ -238,20 +266,21 @@ def get_number_of_courses_per_class(class_id):
 # Class Routes
 @app.route('/class', methods=['POST'])
 def create_class():
-    class_ = Class(request.json['course_id'], request.json['teacher_id'], request.json['schedule_time'])
-    return class_.create('CreateClass', [class_.course_id, class_.teacher_id, class_.schedule_time])
+    class_ = Class(request.json['class_name'])
+    return class_.create('CreateClass', [class_.class_name])
 
 @app.route('/class/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def class_operations(id):
     if request.method == 'GET':
-        class_ = Class(None, None, None)
+        class_ = Class(None)
         return class_.read('ReadClass', id)
     elif request.method == 'PUT':
-        class_ = Class(request.json['course_id'], request.json['teacher_id'], request.json['schedule_time'])
-        return class_.update('UpdateClass', id, [class_.course_id, class_.teacher_id, class_.schedule_time])
+        class_ = Class(request.json['class_name'])
+        return class_.update('UpdateClass', id, [class_.class_name])
     elif request.method == 'DELETE':
-        class_ = Class(None, None, None)
+        class_ = Class(None)
         return class_.delete('DeleteClass', id)
+
 
 @app.route('/class/count', methods=['GET'])
 def get_number_of_classes():
@@ -262,10 +291,15 @@ def get_number_of_classes():
 @app.route('/course-detail-view', methods=['GET'])
 def course_detail_view():
     results = execute_procedure('ReadCourseDetail', [])
-    # Add labels to the results
-    labels = ["course_id", "course_title", "course_description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    
+    # Updated labels to match the new column names
+    labels = ["course_id", "title", "description", "schedule_time", "teacher_name", "class_name"]
+    
+    # Mapping results to a list of dictionaries
     results = [dict(zip(labels, result)) for result in results]
+    
     return jsonify(results), 200
+
 
 @app.route('/class/<int:class_id>/detail', methods=['GET'])
 def class_detail_view(class_id):
@@ -294,7 +328,7 @@ def get_all_admins():
 def get_all_students():
     results = execute_procedure('GetAllStudents', [])
     # Add labels to the results
-    labels = ["id", "name", "email", "date_of_birth"]
+    labels = ["id", "name", "email", "date_of_birth", "class_id"]
     results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
@@ -310,7 +344,7 @@ def get_all_teachers():
 def get_all_courses():
     results = execute_procedure('GetAllCourses', [])
     # Add labels to the results
-    labels = ["id", "title", "description"]
+    labels = ["id", "title", "description", "class_id", "teacher_id", "schedule_time"]
     results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
@@ -318,17 +352,23 @@ def get_all_courses():
 def get_all_classes():
     results = execute_procedure('GetAllClasses', [])
     # Add labels to the results
-    labels = ["id", "course_id", "teacher_id", "schedule_time"]
+    labels = ["id", "class_name"]
     results = [dict(zip(labels, result)) for result in results]
     return jsonify(results), 200
 
+# View Routes
 @app.route('/course-detail-view/all', methods=['GET'])
 def get_all_course_details():
     results = execute_procedure('GetAllCourseDetails', [])
-    # Add labels to the results
-    labels = ["course_id", "course_title", "course_description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    
+    # Updated labels to match the new column names
+    labels = ["course_id", "title", "description", "teacher_id", "teacher_name", "teacher_email", "class_id", "schedule_time"]
+    
+    # Mapping results to a list of dictionaries
     results = [dict(zip(labels, result)) for result in results]
+    
     return jsonify(results), 200
+
 
 # Main execution
 if __name__ == '__main__':
