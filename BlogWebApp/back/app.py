@@ -285,7 +285,7 @@ def update_user(user_id):
     user = User.get_by_id(user_id)
     if user:
         user.update(new_username, new_password)
-        updated_user = User.get_by_id(user_id)  # Retrieve the updated user data
+        updated_user = User.get_by_id(user_id)
         return (
             jsonify(
                 {"username": user.username, "password": user.password, "id": user.id}
