@@ -8,6 +8,7 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -24,7 +25,8 @@ const Profile = () => {
     const [content, setContent] = useState("");
     const [editingPost, setEditingPost] = useState(null);
     const [editedPostData, setEditedPostData] = useState({});
-
+    const navigate = useNavigate();
+    
     // Retrieve the currently logged-in user from localStorage
     const userData = JSON.parse(localStorage.getItem("user"));
 
@@ -92,7 +94,7 @@ const Profile = () => {
             })
             .then((response) => {
                 setUser(response.data);
-
+                
                 // Update user in localStorage
                 localStorage.setItem("user", JSON.stringify(response.data));
 
@@ -117,7 +119,8 @@ const Profile = () => {
             .then((response) => {
                 alert("User deleted successfully!");
                 localStorage.removeItem("user");
-                window.location.reload();
+                navigate('/');
+                
             })
             .catch((error) => console.error("Error deleting user:", error));
         setDeleteUser(false);

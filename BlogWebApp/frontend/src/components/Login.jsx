@@ -145,7 +145,7 @@ function Login() {
                 </div>
                 <div>
                   <p className="text-white mb-6">
-                    Sign in to &apos;App Name&apos;
+                    Sign in to &apos;Blue Blog&apos;
                   </p>
                 </div>
                 <form onSubmit={handleRegister}>

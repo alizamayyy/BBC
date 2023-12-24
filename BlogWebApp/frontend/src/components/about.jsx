@@ -63,8 +63,7 @@ const about = () => {
               Developer
             </p>
             <p className="w-[270px] font-semibold italic text-center ml-3 text-white mt-5 mb-44">
-              &quot;Dami nang nakatingin na gusto na manapak pero chill lang ako
-              dito kasi i don&apos;t give a fuck&quot;
+              &quot;Embrace change, Seek growth.&quot;
             </p>
           </div>
           <div>
@@ -85,7 +84,7 @@ const about = () => {
               Developer
             </p>
             <p className="w-[270px] font-semibold italic text-center ml-3 text-white mt-5 mb-44">
-              &quot;location check? about 2 km/s&quot;
+              &quot;What is grief if not love persevering.&quot;
             </p>
           </div>
           <div>
@@ -106,7 +105,7 @@ const about = () => {
               Developer
             </p>
             <p className="w-[270px] font-semibold italic text-center ml-3 text-white mt-5 mb-44">
-              &quot;Ikaw at Ako. 11 years. B &lt;3 B.&quot;
+              &quot;Be your authentic self.&quot;
             </p>
           </div>
         </div>
